@@ -15,7 +15,7 @@ const AppState = {
     bride: 'Luisa Fernanda',
     monogram: 'F & L',
     weddingDate: '2026-11-14T17:30',
-    couplePhone: '573204545796',
+    couplePhone: '573159649395',
     ceremonyPlace: 'Parroquia Nuestra Señora Del Carmen',
     ceremonyAddress: 'Cra. 5 #18-55, Ibagué, Tolima',
     ceremonyMaps: 'https://www.google.com/maps/search/?api=1&query=Parroquia+Nuestra+Señora+Del+Carmen+Cra+5+18-55+Ibague+Tolima',
@@ -204,7 +204,7 @@ function applyGeneralInvitationToUI() {
   // 5. Botón Directo WhatsApp General
   const btnRSVP = document.getElementById('btnWhatsAppRSVP');
   if (btnRSVP) {
-    const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573204545796';
+    const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573159649395';
     const groom = AppState.weddingSettings.groom;
     const bride = AppState.weddingSettings.bride;
     const message = `¡Hola ${groom} y ${bride}! 🌿🤍 Confirmo con mucha alegría mi asistencia a su matrimonio. ¡Nos vemos allá para celebrar juntos! ✨🕊️`;
@@ -266,7 +266,7 @@ function updateWhatsAppRSVPLink(guest) {
   const btnRSVP = document.getElementById('btnWhatsAppRSVP');
   if (!btnRSVP) return;
 
-  const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573204545796';
+  const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573159649395';
   const groom = AppState.weddingSettings.groom;
   const bride = AppState.weddingSettings.bride;
   const passes = guest.passes || 2;
@@ -727,7 +727,7 @@ window.handleRSVPSubmit = function(event) {
     return;
   }
 
-  const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573204545796';
+  const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573159649395';
   const groom = AppState.weddingSettings.groom;
   const bride = AppState.weddingSettings.bride;
 
