@@ -1076,7 +1076,7 @@
         const currentSt = guestStatuses[g.id] || 'pending';
 
         const passesText = g.passes > 1 ? `(tu invitación está reservada para *${g.passes} personas*)` : `(tu invitación está reservada para *1 persona*)`;
-        const waMsg = `¡Hola *${g.name}*! ✨\n\nEstamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial. 🤍\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${cardLink}\n\nCon todo nuestro cariño,\n— *Fernando & Luisa Fernanda*`;
+        const waMsg = `¡Hola *${g.name}*!\n\nEstamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial.\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${cardLink}\n\nCon todo nuestro cariño,\n— *Fernando & Luisa Fernanda*`;
 
         const waUrl = intlPhone 
           ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waMsg)}`
@@ -1319,7 +1319,7 @@
       const intlPhone = cleanPhone ? (cleanPhone.startsWith('57') ? cleanPhone : `57${cleanPhone}`) : '';
       const numPasses = parseInt(passes, 10) || 1;
       const passesText = numPasses > 1 ? `(tu invitación está reservada para *${numPasses} personas*)` : `(tu invitación está reservada para *1 persona*)`;
-      const waMsg = `¡Hola *${name}*! ✨\n\nEstamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial. 🤍\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${url}\n\nCon todo nuestro cariño,\n— *Fernando & Luisa Fernanda*`;
+      const waMsg = `¡Hola *${name}*!\n\nEstamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial.\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${url}\n\nCon todo nuestro cariño,\n— *Fernando & Luisa Fernanda*`;
 
       document.getElementById('newLinkWaBtn').href = intlPhone 
         ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waMsg)}`

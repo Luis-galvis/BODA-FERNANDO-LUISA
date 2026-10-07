@@ -207,7 +207,7 @@ function applyGeneralInvitationToUI() {
     const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573159649395';
     const groom = AppState.weddingSettings.groom;
     const bride = AppState.weddingSettings.bride;
-    const message = `¡Hola ${groom} y ${bride}! 🌿🤍 Confirmo con mucha alegría mi asistencia a su matrimonio. ¡Nos vemos allá para celebrar juntos! ✨🕊️`;
+    const message = `¡Hola ${groom} y ${bride}! Confirmo con mucha alegría mi asistencia a su matrimonio. ¡Nos vemos allá para celebrar juntos!`;
     btnRSVP.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
   }
 }
@@ -272,7 +272,7 @@ function updateWhatsAppRSVPLink(guest) {
   const passes = guest.passes || 2;
   const s_plural = passes > 1 ? 's' : '';
 
-  const message = `¡Hola ${groom} y ${bride}! 🌿🤍 Confirmo con inmensa alegría la asistencia de *${guest.name}* (${passes} persona${s_plural}) a su matrimonio. ¡Nos vemos allá para celebrar juntos! ✨🕊️`;
+  const message = `¡Hola ${groom} y ${bride}! Confirmo con inmensa alegría la asistencia de *${guest.name}* (${passes} persona${s_plural}) a su matrimonio. ¡Nos vemos allá para celebrar juntos!`;
   
   btnRSVP.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
 }
@@ -731,10 +731,10 @@ window.handleRSVPSubmit = function(event) {
   const groom = AppState.weddingSettings.groom;
   const bride = AppState.weddingSettings.bride;
 
-  const statusText = attendance === 'si' ? '¡Sí, asistiré con mucha alegría! 🌿' : 'Lamentablemente no podré asistir 🤍';
+  const statusText = attendance === 'si' ? '¡Sí, asistiré con mucha alegría!' : 'Lamentablemente no podré asistir';
 
   const rsvpText = [
-    `¡Hola ${groom} y ${bride}! 🌿🤍`,
+    `¡Hola ${groom} y ${bride}!`,
     `*Confirmación de Asistencia a la Boda:*`,
     `• *Invitado:* ${name}`,
     `• *Respuesta:* ${statusText}`,
@@ -868,7 +868,7 @@ function renderHostGuestList() {
     const groom = AppState.weddingSettings.groom;
     const bride = AppState.weddingSettings.bride;
     const passesText = guest.passes > 1 ? `(tu invitación está reservada para *${guest.passes} personas*)` : `(tu invitación está reservada para *1 persona*)`;
-    const waInviteMessage = `¡Hola *${guest.name}*! ✨\n\nEstamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial. 🤍\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${cardLink}\n\nCon todo nuestro cariño,\n— *Fernando & Luisa Fernanda*`;
+    const waInviteMessage = `¡Hola *${guest.name}*!\n\nEstamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial.\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${cardLink}\n\nCon todo nuestro cariño,\n— *Fernando & Luisa Fernanda*`;
 
     const waHref = intlPhone 
       ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waInviteMessage)}`
@@ -972,9 +972,9 @@ window.generateCustomLink = function() {
   const intlPhone = cleanPhone ? (cleanPhone.startsWith('57') ? cleanPhone : `57${cleanPhone}`) : '';
   const groom = AppState.weddingSettings.groom;
   const bride = AppState.weddingSettings.bride;
-  const s_plural = parseInt(passesInput, 10) > 1 ? 's' : '';
-
-  const waMsg = `¡Hola ${nameInput}! 🌿🕊️ Tenemos el inmenso honor de invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${passesInput} persona${s_plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, fiesta y confirmar tu asistencia en tu tarjeta digital aquí:\n${link}\n\n¡Esperamos contar con tu compañía! 🤍\n— *${groom} & ${bride}*`;
+  const numPasses = parseInt(passesInput, 10) || 1;
+  const passesText = numPasses > 1 ? `(tu invitación está reservada para *${numPasses} personas*)` : `(tu invitación está reservada para *1 persona*)`;
+  const waMsg = `¡Hola *${nameInput}*!\n\nEstamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial.\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${link}\n\nCon todo nuestro cariño,\n— *${groom} & ${bride}*`;
 
   waBtn.href = intlPhone 
     ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waMsg)}`
