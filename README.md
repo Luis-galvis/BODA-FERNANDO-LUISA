@@ -81,6 +81,11 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
 | 45 | **Familia Galindo Moreno** | 3 | +57 3213221773 | `?invitado=familia-galindo-moreno` |
 | 46 | **Familia Moreno Gonzalez** | 4 | +57 3222307829 | `?invitado=familia-moreno-gonzalez` |
 | 47 | **Victor y Xilenia** | 2 | +57 3228452238 | `?invitado=victor-y-xilenia` |
+| 48 | **Alexis Rubiano & Sra** | 2 | +57 3148942652 | `?invitado=alexis-rubiano-y-sra` |
+| 49 | **Javier & Sra** | 2 | +57 3045963615 | `?invitado=javier-y-sra` |
+| 50 | **Yeison** | 1 | +57 3154383970 | `?invitado=yeison` |
+| 51 | **Daniela** | 1 | +57 3175844709 | `?invitado=daniela` |
+| 52 | **Juan Pablo** | 1 | +57 3178688336 | `?invitado=juan-pablo` |
 
 ---
 

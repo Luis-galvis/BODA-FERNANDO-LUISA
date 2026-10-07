@@ -1,0 +1,16 @@
+{
+  "name": "bot-envio-boda",
+  "version": "1.0.0",
+  "description": "Envío automatizado de invitaciones de boda vía WhatsApp Baileys",
+  "main": "enviar_boda.js",
+  "type": "module",
+  "scripts": {
+    "start": "node enviar_boda.js",
+    "test-uno": "node enviar_boda.js --test"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.9",
+    "pino": "^9.4.0",
+    "qrcode-terminal": "^0.12.0"
+  }
+}

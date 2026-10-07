@@ -376,6 +376,46 @@ export const GUESTS = [
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
     "phone": "3228452238"
+  },
+  {
+    "id": 48,
+    "slug": "alexis-rubiano-y-sra",
+    "name": "Alexis Rubiano & Sra",
+    "passes": 2,
+    "reservaText": "Esta invitación está reservada para 2 personas",
+    "phone": "3148942652"
+  },
+  {
+    "id": 49,
+    "slug": "javier-y-sra",
+    "name": "Javier & Sra",
+    "passes": 2,
+    "reservaText": "Esta invitación está reservada para 2 personas",
+    "phone": "3045963615"
+  },
+  {
+    "id": 50,
+    "slug": "yeison",
+    "name": "Yeison",
+    "passes": 1,
+    "reservaText": "Esta invitación está reservada para 1 persona",
+    "phone": "3154383970"
+  },
+  {
+    "id": 51,
+    "slug": "daniela",
+    "name": "Daniela",
+    "passes": 1,
+    "reservaText": "Esta invitación está reservada para 1 persona",
+    "phone": "3175844709"
+  },
+  {
+    "id": 52,
+    "slug": "juan-pablo",
+    "name": "Juan Pablo",
+    "passes": 1,
+    "reservaText": "Esta invitación está reservada para 1 persona",
+    "phone": "3178688336"
   }
 ];
 

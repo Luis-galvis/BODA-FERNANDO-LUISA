@@ -1,0 +1,12 @@
+# Node modules
+node_modules/
+bot_envio/node_modules/
+
+# Baileys WhatsApp Session Auth
+bot_envio/auth_baileys/
+auth/
+
+# Logs and scratch
+*.log
+scratch/
+bot_envio/enviados.json
