@@ -86,6 +86,7 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
 | 50 | **Yeison** | 1 | +57 3154383970 | `?invitado=yeison` |
 | 51 | **Daniela** | 1 | +57 3175844709 | `?invitado=daniela` |
 | 52 | **Juan Pablo** | 1 | +57 3178688336 | `?invitado=juan-pablo` |
+| 53 | **Prueba Luisa** | 2 | +57 3172959658 | `?invitado=prueba-luisa` |
 
 ---
 

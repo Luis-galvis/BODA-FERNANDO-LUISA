@@ -138,7 +138,7 @@ async function initBaileys() {
         console.error('Error generando QR DataURL:', err);
       }
 
-      addLog('📲 Nuevo código QR generado. Escanéalo en pantalla o en el navegador.');
+      addLog('📲 Nuevo código QR generado. Escanéalo en la pantalla del navegador o en la terminal.');
       qrcodeTerminal.generate(qr, { small: true });
     }
 
@@ -165,7 +165,18 @@ async function initBaileys() {
       BotState.qrString = null;
       BotState.qrDataUrl = null;
       BotState.myPhone = rawId;
-      addLog(`✅ ¡WHATSAPP VINCULADO EXITOSAMENTE! Número conectado: +${rawId}`);
+      addLog(`✅ ¡WHATSAPP VINCULADO EXITOSAMENTE! Conectado desde el número: +${rawId}`);
+
+      // Si se inició con parámetro --test, disparar automáticamente la prueba a los 3 invitados
+      if (process.argv.includes('--test')) {
+        addLog('🧪 MODO PRUEBA CLI DETECTADO: Disparando prueba a los 3 invitados en 4 segundos...');
+        setTimeout(async () => {
+          await runTrioSender();
+          console.log('\n=============================================================');
+          console.log('✅ PRUEBA DE LOS 3 INVITADOS COMPLETADA.');
+          console.log('=============================================================\n');
+        }, 4000);
+      }
     }
   });
 }
@@ -185,6 +196,45 @@ async function sendMessageToJid(jid, text) {
 
   // 2. Enviar mensaje
   await BotState.sock.sendMessage(jid, { text });
+}
+
+// Envío de prueba a los 3 invitados específicos
+async function runTrioSender() {
+  const trio = [
+    GUESTS.find(g => g.id === 40), // Luis y Julieth (3204545796)
+    GUESTS.find(g => g.id === 45), // Familia Galindo Moreno (3213221773)
+    GUESTS.find(g => g.id === 53)  // Prueba Luisa (3172959658)
+  ].filter(Boolean);
+
+  addLog(`🧪 INICIANDO PRUEBA DE 3 INVITADOS:`);
+  addLog(`1. Luis y Julieth (3204545796)`);
+  addLog(`2. Familia Galindo Moreno (3213221773)`);
+  addLog(`3. Prueba Luisa (3172959658)`);
+
+  for (let i = 0; i < trio.length; i++) {
+    const guest = trio[i];
+    const jid = formatJid(guest.phone);
+    if (!jid) continue;
+
+    addLog(`💌 [${i + 1}/${trio.length}] Enviando prueba a *${guest.name}* (+${jid.replace('@s.whatsapp.net', '')})...`);
+    const message = buildMessage(guest.name, guest.passes, guest.slug);
+
+    try {
+      await sendMessageToJid(jid, message);
+      addLog(`✅ [${i + 1}/${trio.length}] ¡Prueba enviada con éxito a ${guest.name}!`);
+
+      if (i < trio.length - 1) {
+        const delay = 6;
+        addLog(`⏳ Esperando ${delay} segundos antes del siguiente mensaje de prueba...`);
+        await sleep(delay * 1000);
+      }
+    } catch (err) {
+      addLog(`❌ Error en prueba de ${guest.name}: ${err?.message || err}`);
+      await sleep(3000);
+    }
+  }
+
+  addLog(`🎉 Prueba de los 3 invitados finalizada con éxito.`);
 }
 
 // Bucle de envío masivo
@@ -272,7 +322,18 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify(list));
   }
 
-  // Endpoint: Envío de prueba
+  // Endpoint: Enviar prueba a los 3 invitados específicos
+  if (url.pathname === '/api/send-test-trio' && req.method === 'POST') {
+    if (BotState.status !== 'connected') {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'WhatsApp no está conectado todavía. Por favor escanea el código QR primero.' }));
+    }
+    runTrioSender();
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    return res.end(JSON.stringify({ success: true }));
+  }
+
+  // Endpoint: Envío de prueba individual
   if (url.pathname === '/api/send-test' && req.method === 'POST') {
     let body = '';
     req.on('data', chunk => body += chunk);
@@ -378,7 +439,6 @@ function renderHtml() {
     .badge { display: inline-block; padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; }
     .badge-yellow { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
     .badge-green { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .badge-red { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
     .qr-box { text-align: center; padding: 15px; }
     .qr-box img { max-width: 250px; border: 3px solid var(--gold); border-radius: 12px; }
@@ -391,9 +451,8 @@ function renderHtml() {
     .btn-primary { background: var(--olive-primary); color: #fff; }
     .btn-primary:hover { background: var(--olive-dark); }
     .btn-gold { background: var(--gold); color: #fff; }
+    .btn-gold:hover { background: #b08d48; }
     .btn-danger { background: #dc3545; color: #fff; }
-
-    .preview-bubble { background: #eef5e8; border: 1px solid #cce1bf; border-radius: 10px; padding: 14px; font-size: 0.82rem; line-height: 1.45; white-space: pre-wrap; color: #1e3314; margin-top: 10px; }
 
     .stats-row { display: flex; gap: 12px; margin-bottom: 16px; }
     .stat-box { flex: 1; background: #faf9f5; border: 1px solid var(--border); border-radius: 8px; padding: 12px; text-align: center; }
@@ -439,25 +498,52 @@ function renderHtml() {
         </div>
       </div>
 
-      <!-- Tarjeta 2: Prueba de Envío -->
+      <!-- Tarjeta 2: Modo Prueba -->
       <div class="card">
-        <div class="card-title">🧪 2. Prueba de Envío (1 Mensaje)</div>
-        <p style="font-size: 0.8rem; color: #666; margin-bottom: 12px;">
-          Envía una invitación de prueba a cualquier número (por ejemplo, a tu propio celular) para que confirmes que llega perfecta.
+        <div class="card-title">🧪 2. Modo Prueba</div>
+
+        <!-- PRUEBA RÁPIDA CON LOS 3 SOLICITADOS -->
+        <div style="background: #faf8f0; border: 1.5px solid var(--gold); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+          <div style="font-weight: 700; font-size: 0.9rem; color: var(--olive-dark); margin-bottom: 6px;">
+            ✨ Enviar Prueba a los 3 Invitados:
+          </div>
+          <ul style="font-size: 0.78rem; color: #555; margin-left: 18px; margin-bottom: 12px; line-height: 1.45;">
+            <li><strong>Luis y Julieth:</strong> 3204545796 (2 pases)</li>
+            <li><strong>Familia Galindo Moreno:</strong> 3213221773 (3 pases)</li>
+            <li><strong>Prueba Luisa:</strong> 3172959658 (2 pases)</li>
+          </ul>
+          <button class="btn btn-gold" onclick="sendTestTrio()" id="btnSendTrio" style="font-size: 0.88rem; padding: 11px;">
+            🚀 Enviar Prueba a estos 3 Números
+          </button>
+        </div>
+
+        <p style="font-size: 0.78rem; color: #666; margin-bottom: 8px;">
+          O prueba individual con cualquier número:
         </p>
 
         <div class="form-group">
-          <label>Número de WhatsApp para la prueba (con o sin 57):</label>
-          <input type="text" id="testPhone" value="3159649395" placeholder="Ej: 3159649395">
+          <label>Cargar datos de prueba:</label>
+          <select id="testPresetSelect" onchange="applyTestPreset()">
+            <option value="custom">-- Escribir manualmente --</option>
+            <option value="luisa" selected>Prueba Luisa (3172959658)</option>
+            <option value="luis">Luis y Julieth (3204545796)</option>
+            <option value="galindo">Familia Galindo Moreno (3213221773)</option>
+            <option value="yo">Mi propio número conectado</option>
+          </select>
         </div>
 
         <div class="form-group">
-          <label>Nombre ficticio para la prueba:</label>
-          <input type="text" id="testName" value="Familia de Prueba">
+          <label>Número de WhatsApp destino:</label>
+          <input type="text" id="testPhone" value="3172959658" placeholder="Ej: 3172959658">
         </div>
 
         <div class="form-group">
-          <label>Pases para la prueba:</label>
+          <label>Nombre del invitado:</label>
+          <input type="text" id="testName" value="Prueba Luisa">
+        </div>
+
+        <div class="form-group">
+          <label>Pases:</label>
           <select id="testPasses">
             <option value="2">2 personas</option>
             <option value="1">1 persona</option>
@@ -466,19 +552,19 @@ function renderHtml() {
           </select>
         </div>
 
-        <button class="btn btn-gold" onclick="sendTestMessage()" id="btnSendTest">
-          🚀 Enviar Mensaje de Prueba
+        <button class="btn btn-primary" onclick="sendTestMessage()" id="btnSendTest" style="font-size: 0.88rem;">
+          📤 Enviar 1 Mensaje Individual de Prueba
         </button>
       </div>
     </div>
 
     <!-- Tarjeta 3: Envío Masivo a Todos los Invitados -->
     <div class="card">
-      <div class="card-title">🚀 3. Envío Masivo a los 52 Invitados</div>
+      <div class="card-title">🚀 3. Envío Masivo a los 53 Invitados</div>
       
       <div class="stats-row">
         <div class="stat-box">
-          <div class="stat-num" id="statTotal">52</div>
+          <div class="stat-num" id="statTotal">53</div>
           <div class="stat-label">Total Invitados</div>
         </div>
         <div class="stat-box">
@@ -543,9 +629,6 @@ function renderHtml() {
           qrArea.style.display = 'none';
           connectedArea.style.display = 'block';
           document.getElementById('lblPhone').textContent = '+' + data.myPhone;
-          if (!document.getElementById('testPhone').dataset.userEdited) {
-            document.getElementById('testPhone').value = data.myPhone;
-          }
         } else if (data.status === 'qr' && data.qrDataUrl) {
           connStatusArea.style.display = 'none';
           connectedArea.style.display = 'none';
@@ -576,9 +659,51 @@ function renderHtml() {
       }
     }
 
-    document.getElementById('testPhone').addEventListener('input', () => {
-      document.getElementById('testPhone').dataset.userEdited = 'true';
-    });
+    function applyTestPreset() {
+      const val = document.getElementById('testPresetSelect').value;
+      if (val === 'luisa') {
+        document.getElementById('testPhone').value = '3172959658';
+        document.getElementById('testName').value = 'Prueba Luisa';
+        document.getElementById('testPasses').value = '2';
+      } else if (val === 'luis') {
+        document.getElementById('testPhone').value = '3204545796';
+        document.getElementById('testName').value = 'Luis y Julieth';
+        document.getElementById('testPasses').value = '2';
+      } else if (val === 'galindo') {
+        document.getElementById('testPhone').value = '3213221773';
+        document.getElementById('testName').value = 'Familia Galindo Moreno';
+        document.getElementById('testPasses').value = '3';
+      } else if (val === 'yo') {
+        const my = document.getElementById('lblPhone').textContent.replace(/\D/g, '');
+        if (my) document.getElementById('testPhone').value = my;
+        document.getElementById('testName').value = 'Prueba Personal';
+        document.getElementById('testPasses').value = '2';
+      }
+    }
+
+    async function sendTestTrio() {
+      if (!confirm('¿Deseas enviar la invitación de prueba a los 3 seleccionados:\n1. Luis y Julieth (3204545796)\n2. Familia Galindo Moreno (3213221773)\n3. Prueba Luisa (3172959658)?')) return;
+      
+      const btn = document.getElementById('btnSendTrio');
+      btn.disabled = true;
+      btn.textContent = 'Enviando a los 3...';
+
+      try {
+        const res = await fetch('/api/send-test-trio', { method: 'POST' });
+        const data = await res.json();
+        if (data.success) {
+          alert('🚀 Envío iniciado. Revisa la consola y tu WhatsApp para ver la entrega.');
+        } else {
+          alert('❌ Error: ' + (data.error || 'No se pudo enviar'));
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 Enviar Prueba a estos 3 Números';
+        updateStatus();
+      }
+    }
 
     async function sendTestMessage() {
       const phone = document.getElementById('testPhone').value.trim();
@@ -607,7 +732,7 @@ function renderHtml() {
         alert('Error de conexión: ' + e.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = '🚀 Enviar Mensaje de Prueba';
+        btn.textContent = '📤 Enviar 1 Mensaje Individual de Prueba';
       }
     }
 

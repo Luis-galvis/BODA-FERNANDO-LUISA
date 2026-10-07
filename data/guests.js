@@ -416,6 +416,14 @@ export const GUESTS = [
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
     "phone": "3178688336"
+  },
+  {
+    "id": 53,
+    "slug": "prueba-luisa",
+    "name": "Prueba Luisa",
+    "passes": 2,
+    "reservaText": "Esta invitación está reservada para 2 personas",
+    "phone": "3172959658"
   }
 ];
 
