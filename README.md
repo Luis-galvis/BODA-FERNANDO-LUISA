@@ -1,4 +1,4 @@
-# 🌿 Tarjeta de Boda Digital de Lujo • Fernando & Luisa
+# 🌿 Tarjeta de Boda Digital de Lujo • Fernando & Luisa Fernanda
 
 Invitación digital interactiva y de alta costura, inspirada en papelería botánica en **Verde Oliva Sutil**, **Oro Champagne**, un **Sobre 3D con Sello de Lacre** y la canción oficial **"Antes que el tiempo se vaya" de Fonseca & Juanes**.
 
@@ -6,7 +6,7 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
 
 ## 💍 Datos Oficiales de la Boda
 
-- **Novios:** Fernando & Luisa
+- **Novios:** Fernando & Luisa Fernanda
 - **Monograma:** F & L
 - **Fecha:** Sábado, 14 de Noviembre de 2026
 - **Ceremonia Religiosa:** Parroquia Nuestra Señora Del Carmen (Cra. 5 #18-55, Ibagué, Tolima) • **5:30 PM**
@@ -22,7 +22,7 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
    - Ejemplo de enlace: `https://boda-fernando-luisa.vercel.app/?invitado=german-y-mary`
 
 2. **Panel Privado de Novios (`novios.html`):**
-   - Página exclusiva para Fernando y Luisa: `https://boda-fernando-luisa.vercel.app/novios.html`
+   - Página exclusiva para Fernando y Luisa Fernanda: `https://boda-fernando-luisa.vercel.app/novios.html`
    - Incluye el buscador de los **47 invitados** del Excel.
    - **Botón de 1 Clic para WhatsApp**: Abre WhatsApp directamente al celular del invitado con el mensaje de invitación listo y el enlace personalizado.
    - **Botón "Ver"**: Abre la tarjeta de ese invitado en una pestaña nueva.

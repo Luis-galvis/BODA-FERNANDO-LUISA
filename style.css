@@ -1185,7 +1185,7 @@ body {
 
 .timeline-item {
   position: relative;
-  margin-bottom: 18px;
+  margin-bottom: 26px;
   text-align: left;
 }
 
@@ -1196,7 +1196,7 @@ body {
 .timeline-dot {
   position: absolute;
   left: -28px;
-  top: 4px;
+  top: 8px;
   width: 14px;
   height: 14px;
   border-radius: 50%;
@@ -1221,10 +1221,10 @@ body {
 
 .timeline-title {
   font-family: var(--font-serif);
-  font-size: 1.12rem;
-  font-weight: 600;
+  font-size: 1.55rem;
+  font-weight: 700;
   color: var(--color-olive-dark);
-  line-height: 1.35;
+  line-height: 1.25;
 }
 
 .timeline-desc {

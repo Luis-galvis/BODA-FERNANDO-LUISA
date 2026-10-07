@@ -12,7 +12,7 @@ const AppState = {
   isMusicPlaying: false,
   weddingSettings: {
     groom: 'Fernando',
-    bride: 'Luisa',
+    bride: 'Luisa Fernanda',
     monogram: 'F & L',
     weddingDate: '2026-11-14T17:30',
     couplePhone: '573204545796',
@@ -165,14 +165,14 @@ function resolveActiveGuest() {
 
 // Aplicar vista en Modo General (sin invitado específico)
 function applyGeneralInvitationToUI() {
-  document.title = "Boda Fernando & Luisa 🌿";
+  document.title = "Boda Fernando & Luisa Fernanda 🌿";
 
   // 1. Rótulo del Sobre
   const envIntro = document.getElementById('envGuestIntro');
   const envName = document.getElementById('envGuestName');
   const envPasses = document.getElementById('envGuestPasses');
   if (envIntro) envIntro.textContent = "Estás Cordialmente Invitado/a";
-  if (envName) envName.textContent = "Boda Fernando & Luisa";
+  if (envName) envName.textContent = "Boda Fernando & Luisa Fernanda";
   if (envPasses) envPasses.textContent = "Sábado, 14 de Noviembre de 2026 • Ibagué, Tolima";
 
   // 2. Sección Principal de la Tarjeta
@@ -258,7 +258,7 @@ function applyGuestToUI(guest) {
   updateWhatsAppRSVPLink(guest);
 
   // Actualizar título de la página
-  document.title = `Invitación para ${guest.name} • Boda Fernando & Luisa 🌿`;
+  document.title = `Invitación para ${guest.name} • Boda Fernando & Luisa Fernanda 🌿`;
 }
 
 // Actualizar el enlace directo de confirmación por WhatsApp
@@ -870,7 +870,7 @@ function renderHostGuestList() {
     const s_plural = guest.passes > 1 ? 's' : '';
     
     // Mensaje personalizado de invitación para enviar al WhatsApp del invitado
-    const waInviteMessage = `💌 *INVITACIÓN OFICIAL DE BODA* 💍\n\n¡Hola ${guest.name}! Con inmensa alegría queremos invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${guest.passes} persona${s_plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, recepción y confirmar tu asistencia en tu tarjeta interactiva aquí:\n${cardLink}\n\n⚠️ *Por favor confirmar antes del 13 de Octubre para asegurar tu reserva.*\n\n¡Esperamos contar con tu compañía en este día tan especial! 🤍\n— *Fernando & Luisa*`;
+    const waInviteMessage = `💌 *INVITACIÓN OFICIAL DE BODA* 💍\n\n¡Hola ${guest.name}! Con inmensa alegría queremos invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${guest.passes} persona${s_plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, recepción y confirmar tu asistencia en tu tarjeta interactiva aquí:\n${cardLink}\n\n⚠️ *Por favor confirmar antes del 13 de Octubre para asegurar tu reserva.*\n\n¡Esperamos contar con tu compañía en este día tan especial! 🤍\n— *Fernando & Luisa Fernanda*`;
 
     const waHref = intlPhone 
       ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waInviteMessage)}`

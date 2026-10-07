@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel de Novios • Boda Fernando & Luisa 🌿</title>
+  <title>Panel de Novios • Boda Fernando & Luisa Fernanda 🌿</title>
   <link rel="icon" type="image/jpeg" href="assets/monograma_boda.jpg">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -694,7 +694,7 @@
       <div class="admin-logo-circle">F & L</div>
       <div>
         <h1>Panel Privado de Novios</h1>
-        <p>Boda Fernando & Luisa 🌿</p>
+        <p>Boda Fernando & Luisa Fernanda 🌿</p>
       </div>
     </div>
     <div class="nav-actions">
@@ -863,7 +863,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Nombre de la Novia:</label>
-            <input type="text" class="form-input" id="setBride" value="Luisa">
+            <input type="text" class="form-input" id="setBride" value="Luisa Fernanda">
           </div>
           <div class="form-group">
             <label class="form-label">Monograma (Iniciales):</label>
@@ -1075,7 +1075,7 @@
         const plural = g.passes > 1 ? 's' : '';
         const currentSt = guestStatuses[g.id] || 'pending';
 
-        const waMsg = `💌 *INVITACIÓN OFICIAL DE BODA* 💍\n\n¡Hola ${g.name}! Con inmensa alegría queremos invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${g.passes} persona${plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, recepción y confirmar tu asistencia en tu tarjeta interactiva aquí:\n${cardLink}\n\n⚠️ *Por favor confirmar asistencia antes del 13 de Octubre para asegurar tu reserva.*\n\n¡Esperamos de todo corazón contar con tu compañía! 🤍\n— *Fernando & Luisa*`;
+        const waMsg = `💌 *INVITACIÓN OFICIAL DE BODA* 💍\n\n¡Hola ${g.name}! Con inmensa alegría queremos invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${g.passes} persona${plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, recepción y confirmar tu asistencia en tu tarjeta interactiva aquí:\n${cardLink}\n\n⚠️ *Por favor confirmar asistencia antes del 13 de Octubre para asegurar tu reserva.*\n\n¡Esperamos de todo corazón contar con tu compañía! 🤍\n— *Fernando & Luisa Fernanda*`;
 
         const waUrl = intlPhone 
           ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waMsg)}`
@@ -1317,7 +1317,7 @@
       const cleanPhone = phone.replace(/\D/g, '');
       const intlPhone = cleanPhone ? (cleanPhone.startsWith('57') ? cleanPhone : `57${cleanPhone}`) : '';
       const plural = parseInt(passes, 10) > 1 ? 's' : '';
-      const waMsg = `💌 *INVITACIÓN OFICIAL DE BODA* 💍\n\n¡Hola ${name}! Con inmensa alegría queremos invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${passes} persona${plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, fiesta y confirmar tu asistencia en tu tarjeta interactiva aquí:\n${url}\n\n⚠️ *Por favor confirmar asistencia antes del 13 de Octubre para asegurar tu reserva.*\n\n¡Esperamos contar con tu compañía! 🤍\n— *Fernando & Luisa*`;
+      const waMsg = `💌 *INVITACIÓN OFICIAL DE BODA* 💍\n\n¡Hola ${name}! Con inmensa alegría queremos invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${passes} persona${plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, fiesta y confirmar tu asistencia en tu tarjeta interactiva aquí:\n${url}\n\n⚠️ *Por favor confirmar asistencia antes del 13 de Octubre para asegurar tu reserva.*\n\n¡Esperamos contar con tu compañía! 🤍\n— *Fernando & Luisa Fernanda*`;
 
       document.getElementById('newLinkWaBtn').href = intlPhone 
         ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waMsg)}`
