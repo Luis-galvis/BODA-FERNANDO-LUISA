@@ -205,8 +205,8 @@ export const GUESTS = [
     "id": 26,
     "slug": "familia-guzman-moreno",
     "name": "Familia Guzman Moreno",
-    "passes": 5,
-    "reservaText": "Esta invitación está reservada para 5 personas",
+    "passes": 4,
+    "reservaText": "Esta invitación está reservada para 4 personas",
     "phone": "3176999226"
   },
   {
@@ -371,10 +371,10 @@ export const GUESTS = [
   },
   {
     "id": 47,
-    "slug": "alexis-rubiano-y-sra",
-    "name": "Alexis Rubiano & Sra",
-    "passes": 2,
-    "reservaText": "Esta invitación está reservada para 2 personas",
+    "slug": "alexis-rubiano",
+    "name": "Alexis Rubiano",
+    "passes": 1,
+    "reservaText": "Esta invitación está reservada para 1 persona",
     "phone": "3148942652"
   },
   {

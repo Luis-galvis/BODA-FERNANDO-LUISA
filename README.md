@@ -59,7 +59,7 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
 | 23 | **Martha Diaz** | 1 | +57 3216770790 | ?invitado=martha-diaz |
 | 24 | **Ciro y Adriana** | 2 | +57 3162543924 | ?invitado=ciro-y-adriana |
 | 25 | **Miryam** | 1 | +57 3125429353 | ?invitado=miryam |
-| 26 | **Familia Guzman Moreno** | 5 | +57 3176999226 | ?invitado=familia-guzman-moreno |
+| 26 | **Familia Guzman Moreno** | 4 | +57 3176999226 | ?invitado=familia-guzman-moreno |
 | 27 | **Camilo** | 1 | +57 3023631131 | ?invitado=camilo |
 | 28 | **Mayra** | 1 | +57 3118965505 | ?invitado=mayra |
 | 29 | **Leidy** | 1 | +57 3115698018 | ?invitado=leidy |
@@ -80,7 +80,7 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
 | 44 | **Familia Galindo Moreno** | 3 | +57 3213221773 | ?invitado=familia-galindo-moreno |
 | 45 | **Familia Moreno Gonzalez** | 4 | +57 3222307829 | ?invitado=familia-moreno-gonzalez |
 | 46 | **Victor y Xilenia** | 2 | +57 3228452238 | ?invitado=victor-y-xilenia |
-| 47 | **Alexis Rubiano & Sra** | 2 | +57 3148942652 | ?invitado=alexis-rubiano-y-sra |
+| 47 | **Alexis Rubiano** | 1 | +57 3148942652 | ?invitado=alexis-rubiano |
 | 48 | **Javier & Sra** | 2 | +57 3045963615 | ?invitado=javier-y-sra |
 | 49 | **Yeison** | 1 | +57 3154383970 | ?invitado=yeison |
 | 50 | **Daniela** | 1 | +57 3175844709 | ?invitado=daniela |
