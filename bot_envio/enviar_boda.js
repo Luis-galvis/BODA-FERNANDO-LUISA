@@ -232,9 +232,9 @@ async function sendMessageToJid(jid, guest, text) {
 // Envío de prueba a los 3 invitados específicos
 async function runTrioSender() {
   const trio = [
-    GUESTS.find(g => g.id === 40) || { id: 40, name: 'Luis y Julieth', phone: '3204545796', passes: 2, slug: 'luis-y-julieth' },
-    GUESTS.find(g => g.id === 45) || { id: 45, name: 'Familia Galindo Moreno', phone: '3213221773', passes: 3, slug: 'familia-galindo-moreno' },
-    GUESTS.find(g => g.id === 53) || { id: 53, name: 'Prueba Luisa', phone: '3172959658', passes: 2, slug: 'prueba-luisa' }
+    GUESTS.find(g => g.slug === 'luis-y-julieth') || { name: 'Luis y Julieth', phone: '3204545796', passes: 2, slug: 'luis-y-julieth' },
+    GUESTS.find(g => g.slug === 'familia-galindo-moreno') || { name: 'Familia Galindo Moreno', phone: '3213221773', passes: 3, slug: 'familia-galindo-moreno' },
+    GUESTS.find(g => g.slug === 'prueba-luisa') || { name: 'Prueba Luisa', phone: '3172959658', passes: 2, slug: 'prueba-luisa' }
   ];
 
   addLog(`🧪 INICIANDO PRUEBA DE 3 INVITADOS EN PDF:`);

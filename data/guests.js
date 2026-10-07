@@ -1,5 +1,5 @@
 // Lista oficial de invitados para la boda
-// Extraccion automatica y normalizada desde lista_invitados_boda.xlsx (Hoja1)
+// Extraccion automatica y normalizada desde lista_invitados_boda.xlsx
 export const GUESTS = [
   {
     "id": 1,
@@ -115,14 +115,6 @@ export const GUESTS = [
   },
   {
     "id": 15,
-    "slug": "johnatan-y-natalie-2",
-    "name": "Johnatan y Natalie",
-    "passes": 2,
-    "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3118743382"
-  },
-  {
-    "id": 16,
     "slug": "marcela",
     "name": "Marcela",
     "passes": 1,
@@ -130,7 +122,7 @@ export const GUESTS = [
     "phone": "3128813030"
   },
   {
-    "id": 17,
+    "id": 16,
     "slug": "katalina",
     "name": "Katalina",
     "passes": 1,
@@ -138,7 +130,7 @@ export const GUESTS = [
     "phone": "3161958838"
   },
   {
-    "id": 18,
+    "id": 17,
     "slug": "norma",
     "name": "Norma",
     "passes": 1,
@@ -146,7 +138,7 @@ export const GUESTS = [
     "phone": "3053473390"
   },
   {
-    "id": 19,
+    "id": 18,
     "slug": "xiomara",
     "name": "Xiomara",
     "passes": 1,
@@ -154,7 +146,7 @@ export const GUESTS = [
     "phone": "3106959140"
   },
   {
-    "id": 20,
+    "id": 19,
     "slug": "andrea",
     "name": "Andrea",
     "passes": 1,
@@ -162,7 +154,7 @@ export const GUESTS = [
     "phone": "3148942658"
   },
   {
-    "id": 21,
+    "id": 20,
     "slug": "nubia",
     "name": "Nubia",
     "passes": 1,
@@ -170,7 +162,7 @@ export const GUESTS = [
     "phone": "3123962885"
   },
   {
-    "id": 22,
+    "id": 21,
     "slug": "jairo-e-irma",
     "name": "Jairo e Irma",
     "passes": 2,
@@ -178,7 +170,7 @@ export const GUESTS = [
     "phone": "3155451681"
   },
   {
-    "id": 23,
+    "id": 22,
     "slug": "oscar-y-lina",
     "name": "Oscar y Lina",
     "passes": 2,
@@ -186,7 +178,7 @@ export const GUESTS = [
     "phone": "3168258737"
   },
   {
-    "id": 24,
+    "id": 23,
     "slug": "martha-diaz",
     "name": "Martha Diaz",
     "passes": 1,
@@ -194,7 +186,7 @@ export const GUESTS = [
     "phone": "3216770790"
   },
   {
-    "id": 25,
+    "id": 24,
     "slug": "ciro-y-adriana",
     "name": "Ciro y Adriana",
     "passes": 2,
@@ -202,7 +194,7 @@ export const GUESTS = [
     "phone": "3162543924"
   },
   {
-    "id": 26,
+    "id": 25,
     "slug": "miryam",
     "name": "Miryam",
     "passes": 1,
@@ -210,7 +202,7 @@ export const GUESTS = [
     "phone": "3125429353"
   },
   {
-    "id": 27,
+    "id": 26,
     "slug": "familia-guzman-moreno",
     "name": "Familia Guzman Moreno",
     "passes": 5,
@@ -218,7 +210,7 @@ export const GUESTS = [
     "phone": "3176999226"
   },
   {
-    "id": 28,
+    "id": 27,
     "slug": "camilo",
     "name": "Camilo",
     "passes": 1,
@@ -226,7 +218,7 @@ export const GUESTS = [
     "phone": "3023631131"
   },
   {
-    "id": 29,
+    "id": 28,
     "slug": "mayra",
     "name": "Mayra",
     "passes": 1,
@@ -234,7 +226,7 @@ export const GUESTS = [
     "phone": "3118965505"
   },
   {
-    "id": 30,
+    "id": 29,
     "slug": "leidy",
     "name": "Leidy",
     "passes": 1,
@@ -242,7 +234,7 @@ export const GUESTS = [
     "phone": "3115698018"
   },
   {
-    "id": 31,
+    "id": 30,
     "slug": "raul-y-sandra",
     "name": "Raul y Sandra",
     "passes": 2,
@@ -250,7 +242,7 @@ export const GUESTS = [
     "phone": "3015092937"
   },
   {
-    "id": 32,
+    "id": 31,
     "slug": "liss-y-vivi",
     "name": "Liss y Vivi",
     "passes": 2,
@@ -258,7 +250,7 @@ export const GUESTS = [
     "phone": "3045512639"
   },
   {
-    "id": 33,
+    "id": 32,
     "slug": "familia-orozco-moreno",
     "name": "Familia Orozco Moreno",
     "passes": 4,
@@ -266,7 +258,7 @@ export const GUESTS = [
     "phone": "3046808114"
   },
   {
-    "id": 34,
+    "id": 33,
     "slug": "alberto-y-edith",
     "name": "Alberto y Edith",
     "passes": 2,
@@ -274,7 +266,7 @@ export const GUESTS = [
     "phone": "3123633979"
   },
   {
-    "id": 35,
+    "id": 34,
     "slug": "jairo-y-diana",
     "name": "Jairo y Diana",
     "passes": 2,
@@ -282,7 +274,7 @@ export const GUESTS = [
     "phone": "3134699155"
   },
   {
-    "id": 36,
+    "id": 35,
     "slug": "luisa-y-fercho",
     "name": "Luisa y Fercho",
     "passes": 2,
@@ -290,7 +282,7 @@ export const GUESTS = [
     "phone": "3172959658"
   },
   {
-    "id": 37,
+    "id": 36,
     "slug": "fercho-y-luisa",
     "name": "Fercho y Luisa",
     "passes": 2,
@@ -298,7 +290,7 @@ export const GUESTS = [
     "phone": "3178411896"
   },
   {
-    "id": 38,
+    "id": 37,
     "slug": "oscar-y-blanca",
     "name": "Oscar y Blanca",
     "passes": 2,
@@ -306,7 +298,7 @@ export const GUESTS = [
     "phone": "3178492983"
   },
   {
-    "id": 39,
+    "id": 38,
     "slug": "maria-jose",
     "name": "Maria Jose",
     "passes": 1,
@@ -314,7 +306,7 @@ export const GUESTS = [
     "phone": "3187026437"
   },
   {
-    "id": 40,
+    "id": 39,
     "slug": "luis-y-julieth",
     "name": "Luis y Julieth",
     "passes": 2,
@@ -322,7 +314,7 @@ export const GUESTS = [
     "phone": "3204545796"
   },
   {
-    "id": 41,
+    "id": 40,
     "slug": "fernando-y-alejandra",
     "name": "Fernando y Alejandra",
     "passes": 2,
@@ -330,7 +322,7 @@ export const GUESTS = [
     "phone": "3205582770"
   },
   {
-    "id": 42,
+    "id": 41,
     "slug": "yesid-y-martha",
     "name": "Yesid y Martha",
     "passes": 2,
@@ -338,7 +330,7 @@ export const GUESTS = [
     "phone": "3205633432"
   },
   {
-    "id": 43,
+    "id": 42,
     "slug": "santiago-y-valen",
     "name": "Santiago y Valen",
     "passes": 2,
@@ -346,7 +338,7 @@ export const GUESTS = [
     "phone": "3212082769"
   },
   {
-    "id": 44,
+    "id": 43,
     "slug": "camilo-y-lina",
     "name": "Camilo y Lina",
     "passes": 2,
@@ -354,7 +346,7 @@ export const GUESTS = [
     "phone": "3212318833"
   },
   {
-    "id": 45,
+    "id": 44,
     "slug": "familia-galindo-moreno",
     "name": "Familia Galindo Moreno",
     "passes": 3,
@@ -362,7 +354,7 @@ export const GUESTS = [
     "phone": "3213221773"
   },
   {
-    "id": 46,
+    "id": 45,
     "slug": "familia-moreno-gonzalez",
     "name": "Familia Moreno Gonzalez",
     "passes": 4,
@@ -370,7 +362,7 @@ export const GUESTS = [
     "phone": "3222307829"
   },
   {
-    "id": 47,
+    "id": 46,
     "slug": "victor-y-xilenia",
     "name": "Victor y Xilenia",
     "passes": 2,
@@ -378,7 +370,7 @@ export const GUESTS = [
     "phone": "3228452238"
   },
   {
-    "id": 48,
+    "id": 47,
     "slug": "alexis-rubiano-y-sra",
     "name": "Alexis Rubiano & Sra",
     "passes": 2,
@@ -386,7 +378,7 @@ export const GUESTS = [
     "phone": "3148942652"
   },
   {
-    "id": 49,
+    "id": 48,
     "slug": "javier-y-sra",
     "name": "Javier & Sra",
     "passes": 2,
@@ -394,7 +386,7 @@ export const GUESTS = [
     "phone": "3045963615"
   },
   {
-    "id": 50,
+    "id": 49,
     "slug": "yeison",
     "name": "Yeison",
     "passes": 1,
@@ -402,7 +394,7 @@ export const GUESTS = [
     "phone": "3154383970"
   },
   {
-    "id": 51,
+    "id": 50,
     "slug": "daniela",
     "name": "Daniela",
     "passes": 1,
@@ -410,7 +402,7 @@ export const GUESTS = [
     "phone": "3175844709"
   },
   {
-    "id": 52,
+    "id": 51,
     "slug": "juan-pablo",
     "name": "Juan Pablo",
     "passes": 1,
@@ -418,7 +410,7 @@ export const GUESTS = [
     "phone": "3178688336"
   },
   {
-    "id": 53,
+    "id": 52,
     "slug": "prueba-luisa",
     "name": "Prueba Luisa",
     "passes": 2,
