@@ -181,7 +181,7 @@ async function initBaileys() {
   });
 }
 
-// Función de envío individual
+// Función de envío individual (con imagen de gala adjunta)
 async function sendMessageToJid(jid, text) {
   if (!BotState.sock || BotState.status !== 'connected') {
     throw new Error('WhatsApp no está conectado todavía. Por favor escanea el código QR.');
@@ -194,8 +194,17 @@ async function sendMessageToJid(jid, text) {
     await BotState.sock.sendPresenceUpdate('paused', jid);
   } catch (_) {}
 
-  // 2. Enviar mensaje
-  await BotState.sock.sendMessage(jid, { text });
+  // 2. Enviar con la tarjeta de boda de gala como imagen adjunta
+  const imagePath = path.join(__dirname, '../assets/tarjeta_invitacion_whatsapp.jpg');
+  if (fs.existsSync(imagePath)) {
+    const imageBuffer = fs.readFileSync(imagePath);
+    await BotState.sock.sendMessage(jid, { 
+      image: imageBuffer, 
+      caption: text 
+    });
+  } else {
+    await BotState.sock.sendMessage(jid, { text });
+  }
 }
 
 // Envío de prueba a los 3 invitados específicos
@@ -395,6 +404,15 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify({ success: true }));
   }
 
+  // Endpoint: Servir imagen de gala de la tarjeta
+  if (url.pathname === '/preview-card.jpg') {
+    const imgPath = path.join(__dirname, '../assets/tarjeta_invitacion_whatsapp.jpg');
+    if (fs.existsSync(imgPath)) {
+      res.writeHead(200, { 'Content-Type': 'image/jpeg' });
+      return res.end(fs.readFileSync(imgPath));
+    }
+  }
+
   // Servir Interfaz Gráfica HTML
   if (url.pathname === '/' || url.pathname === '/index.html') {
     res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
@@ -468,6 +486,19 @@ function renderHtml() {
       <h1>💍 Bot de Envío de Invitaciones de Boda</h1>
       <p>Envío automático y seguro vía WhatsApp • Fernando & Luisa Fernanda</p>
     </header>
+
+    <!-- Banner informativo de la tarjeta de invitación que se adjunta -->
+    <div style="display: flex; align-items: center; gap: 18px; background: #faf8f0; border: 1.5px solid var(--gold); border-radius: 14px; padding: 14px 20px; margin-bottom: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+      <img src="/preview-card.jpg" style="width: 75px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.12);" alt="Tarjeta de Boda">
+      <div>
+        <div style="font-weight: 700; font-size: 0.95rem; color: var(--olive-dark); margin-bottom: 4px;">
+          📸 Cada invitado recibirá esta hermosa foto de la tarjeta de gala directamente en WhatsApp
+        </div>
+        <p style="font-size: 0.82rem; color: #555; line-height: 1.45;">
+          Al llegar como una <strong>foto real de boda</strong> con sus nombres y su enlace en el pie de foto, los familiares y amigos ven de inmediato que es una tarjeta auténtica de los novios, generando total confianza para abrirla y confirmar su asistencia.
+        </p>
+      </div>
+    </div>
 
     <div class="grid">
       <!-- Tarjeta 1: Conexión con WhatsApp -->
