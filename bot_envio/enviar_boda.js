@@ -93,6 +93,15 @@ function formatJid(phone) {
   return `${intl}@s.whatsapp.net`;
 }
 
+function slugify(text) {
+  if (!text) return 'invitado';
+  return text.toString().toLowerCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/&/g, 'y')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 // Iniciar conexión con Baileys
 async function initBaileys() {
   addLog('Iniciando cliente de WhatsApp Baileys...');
@@ -181,14 +190,24 @@ async function sendMessageToJid(jid, guest, text) {
   } catch (_) {}
 
   // 2. Buscar archivo PDF personalizado del invitado
-  const slug = guest?.slug || 'prueba';
+  let slug = guest?.slug;
+  if (!slug && guest?.name) {
+    slug = slugify(guest.name);
+  }
+  if (!slug) slug = 'invitado';
+
   let pdfPath = path.join(PDF_DIR, `Invitacion_Boda_${slug}.pdf`);
 
-  // Si no existe, generarlo
+  // Si no existe, generarlo inmediatamente
   if (!fs.existsSync(pdfPath)) {
     try {
-      execSync(`python "${path.join(__dirname, 'generar_pdfs.py')}"`, { stdio: 'ignore' });
-    } catch (_) {}
+      const guestObj = JSON.stringify({ name: guest.name, slug: slug, passes: guest.passes || 1 });
+      execSync(`python "${path.join(__dirname, 'generar_pdfs.py')}" --single '${guestObj.replace(/'/g, "\\'")}'`, { stdio: 'ignore' });
+    } catch (_) {
+      try {
+        execSync(`python "${path.join(__dirname, 'generar_pdfs.py')}"`, { stdio: 'ignore' });
+      } catch (_) {}
+    }
   }
 
   if (fs.existsSync(pdfPath)) {
@@ -210,20 +229,39 @@ async function sendMessageToJid(jid, guest, text) {
   }
 }
 
-// Envío de prueba exclusivo al número de control (3204545796)
-async function runTestSender() {
-  const targetGuest = GUESTS.find(g => g.id === 40) || { name: 'Luis y Julieth', phone: '3204545796', passes: 2, slug: 'luis-y-julieth' };
-  const jid = formatJid('3204545796');
+// Envío de prueba a los 3 invitados específicos
+async function runTrioSender() {
+  const trio = [
+    GUESTS.find(g => g.id === 40) || { id: 40, name: 'Luis y Julieth', phone: '3204545796', passes: 2, slug: 'luis-y-julieth' },
+    GUESTS.find(g => g.id === 45) || { id: 45, name: 'Familia Galindo Moreno', phone: '3213221773', passes: 3, slug: 'familia-galindo-moreno' },
+    GUESTS.find(g => g.id === 53) || { id: 53, name: 'Prueba Luisa', phone: '3172959658', passes: 2, slug: 'prueba-luisa' }
+  ];
 
-  addLog(`🧪 Enviando prueba de PDF con miniatura a *${targetGuest.name}* (+57 3204545796)...`);
-  const message = buildMessage(targetGuest.name, targetGuest.passes);
+  addLog(`🧪 INICIANDO PRUEBA DE 3 INVITADOS EN PDF:`);
+  for (let i = 0; i < trio.length; i++) {
+    const guest = trio[i];
+    const jid = formatJid(guest.phone);
+    if (!jid) continue;
 
-  try {
-    await sendMessageToJid(jid, targetGuest, message);
-    addLog(`✅ ¡Prueba de PDF con previsualización enviada con éxito a ${targetGuest.name}!`);
-  } catch (err) {
-    addLog(`❌ Error en prueba: ${err?.message || err}`);
+    addLog(`📄 [${i + 1}/${trio.length}] Enviando PDF oficial a *${guest.name}* (+${guest.phone})...`);
+    const message = buildMessage(guest.name, guest.passes);
+
+    try {
+      await sendMessageToJid(jid, guest, message);
+      addLog(`✅ [${i + 1}/${trio.length}] ¡PDF entregado con éxito a ${guest.name}!`);
+
+      if (i < trio.length - 1) {
+        const delay = 5;
+        addLog(`⏳ Esperando ${delay} segundos antes del siguiente...`);
+        await sleep(delay * 1000);
+      }
+    } catch (err) {
+      addLog(`❌ Error en prueba de ${guest.name}: ${err?.message || err}`);
+      await sleep(3000);
+    }
   }
+
+  addLog(`🎉 Prueba de los 3 invitados finalizada con éxito.`);
 }
 
 // Bucle de envío masivo
@@ -317,7 +355,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: 'WhatsApp no está conectado todavía. Por favor escanea el código QR primero.' }));
     }
-    runTestSender();
+    runTrioSender();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ success: true }));
   }
@@ -329,23 +367,33 @@ const server = http.createServer(async (req, res) => {
     req.on('end', async () => {
       try {
         const data = JSON.parse(body);
-        const targetPhone = data.phone || BotState.myPhone;
-        const guestName = data.name || 'Invitado de Prueba';
-        const passes = data.passes || 2;
-        const slug = data.slug || 'prueba-luisa';
-
+        const targetPhone = (data.phone || BotState.myPhone || '').toString().trim();
         const jid = formatJid(targetPhone);
         if (!jid) {
           res.writeHead(400, { 'Content-Type': 'application/json' });
           return res.end(JSON.stringify({ error: 'Número de teléfono inválido' }));
         }
 
+        const cleanDigits = targetPhone.replace(/\D/g, '');
+        const matched = GUESTS.find(g => {
+          const gPhone = (g.phone || '').toString().replace(/\D/g, '');
+          return gPhone && cleanDigits && (cleanDigits.endsWith(gPhone) || gPhone.endsWith(cleanDigits));
+        }) || GUESTS.find(g => g.name.toLowerCase() === (data.name || '').toLowerCase());
+
+        const guestName = data.name || matched?.name || 'Apreciado Invitado';
+        const passes = data.passes || matched?.passes || 2;
+        
+        let slug = data.slug;
+        if (!slug || (slug === 'prueba-luisa' && guestName !== 'Prueba Luisa')) {
+          slug = matched?.slug || slugify(guestName);
+        }
+
         const msg = buildMessage(guestName, passes);
         const testGuest = { name: guestName, passes: passes, slug: slug };
 
-        addLog(`🧪 Enviando prueba en PDF a ${guestName} (+${jid.replace('@s.whatsapp.net', '')})...`);
+        addLog(`🧪 Enviando prueba en PDF a ${guestName} (+${jid.replace('@s.whatsapp.net', '')}) [PDF: Invitacion_Boda_${slug}.pdf]...`);
         await sendMessageToJid(jid, testGuest, msg);
-        addLog(`✅ ¡Prueba en PDF enviada con éxito a +${jid.replace('@s.whatsapp.net', '')}!`);
+        addLog(`✅ ¡Prueba en PDF enviada con éxito a ${guestName}!`);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
         return res.end(JSON.stringify({ success: true, message: 'Invitación en PDF enviada exitosamente' }));
@@ -734,11 +782,18 @@ function renderHtml() {
       btn.disabled = true;
       btn.textContent = 'Enviando PDF...';
 
+      // Calcular slug dinámico según el nombre del invitado
+      const slug = name.toLowerCase().trim()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/&/g, 'y')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+
       try {
         const res = await fetch('/api/send-test', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, name, passes, slug: 'prueba-luisa' })
+          body: JSON.stringify({ phone, name, passes, slug })
         });
         const data = await res.json();
         if (data.success) {

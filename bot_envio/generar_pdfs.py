@@ -133,4 +133,10 @@ def generate_all_pdfs():
     print(f'Completado: generados {len(guests)} PDFs en {PDF_DIR}')
 
 if __name__ == '__main__':
-    generate_all_pdfs()
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == '--single':
+        data = json.loads(sys.argv[2])
+        p = generate_pdf_for_guest(data)
+        print(f'Generado: {p}')
+    else:
+        generate_all_pdfs()
