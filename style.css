@@ -492,14 +492,70 @@ body {
 }
 
 /* ==========================================================================
-   SECCIÓN DE HUELLITAS DE PERRO (PERSONALIZABLE) 🐾
+   SECCIÓN DE NUESTROS AMORES (HIJOS + FIEL COMPAÑERO DE CUATRO PATAS) 🐾
    ========================================================================== */
+.nuestros-amores-container,
 .dog-paws-container {
   display: flex;
   justify-content: center;
-  margin: 16px auto 24px;
+  margin: 16px auto 22px;
   position: relative;
   z-index: 2;
+  width: 100%;
+}
+
+.nuestros-amores-card {
+  background: rgba(255, 253, 248, 0.95);
+  border: 1.5px dashed rgba(197, 160, 89, 0.65);
+  border-radius: 14px;
+  padding: 14px 18px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(45, 55, 35, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  max-width: 440px;
+  width: 100%;
+}
+
+.nuestros-amores-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(197, 160, 89, 0.2);
+}
+
+.amores-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.amores-icon-heart {
+  font-size: 0.95rem;
+}
+
+.amores-icon-paw {
+  font-size: 0.95rem;
+}
+
+.amores-title {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--color-gold-deep);
+  font-weight: 700;
+}
+
+.amores-quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.94rem;
+  color: var(--color-text-main);
+  line-height: 1.4;
+  margin: 0;
+  text-align: center;
 }
 
 .dog-paws-badge {
@@ -647,22 +703,38 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 76px;
-  height: 76px;
+  width: 140px;
+  height: 140px;
   border-radius: 50%;
   border: 1.5px solid var(--color-gold-primary);
-  background: radial-gradient(circle, #fffbf2 0%, #f6f1e6 100%);
-  box-shadow: 0 6px 18px rgba(197, 160, 89, 0.25);
+  background: radial-gradient(circle, #fffdf8 0%, #f6f1e6 100%);
+  box-shadow: 0 8px 25px rgba(197, 160, 89, 0.28);
   margin-bottom: 16px;
   position: relative;
+  overflow: hidden;
+  padding: 4px;
 }
 
 .monogram-emblem::before {
   content: '';
   position: absolute;
-  inset: -6px;
+  inset: -5px;
   border-radius: 50%;
   border: 1px dashed rgba(197, 160, 89, 0.5);
+  pointer-events: none;
+}
+
+.monogram-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.08));
+  transition: transform 0.4s ease;
+}
+
+.monogram-emblem:hover .monogram-img {
+  transform: scale(1.05);
 }
 
 .monogram-text {
@@ -1219,51 +1291,57 @@ body {
 
 .palette-swatches.reserved-swatches {
   display: flex;
-  justify-content: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  gap: 6px;
+  flex-wrap: nowrap;
   margin-bottom: 6px;
+  width: 100%;
 }
 
 .swatch-item.swatch-reserved {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
-  min-width: 68px;
+  gap: 5px;
+  flex: 1;
+  max-width: 70px;
+  min-width: 0;
 }
 
 .swatch-reserved .swatch-circle {
-  width: 48px;
-  height: 48px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
-  border: 3px solid #fff;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border: 2px solid #fff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
   transition: transform 0.25s ease;
 }
 
 .swatch-reserved:hover .swatch-circle {
-  transform: scale(1.1);
+  transform: scale(1.12);
 }
 
 .swatch-reserved .swatch-name {
   font-family: var(--font-display);
-  font-size: 0.78rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--color-olive-dark);
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .swatch-reserved .swatch-tag {
   font-family: var(--font-sans);
-  font-size: 0.62rem;
+  font-size: 0.54rem;
   font-weight: 700;
   text-transform: uppercase;
   color: #fff;
   background: #a44f3b;
-  padding: 2px 7px;
+  padding: 2px 5px;
   border-radius: 10px;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
 }
 
 .dress-code-caution {
@@ -1280,11 +1358,11 @@ body {
 }
 
 /* ==========================================================================
-   LLUVIA DE SOBRES & DATOS BANCARIOS (GIFT SECTION)
+   LLUVIA DE SOBRES (SOLO BUZÓN DE SOBRES - SIN CUENTAS BANCARIAS)
    ========================================================================== */
 .gift-section {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(197, 160, 89, 0.4);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(197, 160, 89, 0.45);
   border-radius: 14px;
   padding: 24px 20px;
   text-align: center;
@@ -1294,84 +1372,33 @@ body {
   z-index: 2;
 }
 
-.gift-icon {
-  width: 48px;
-  height: 48px;
+.gift-icon-container {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--color-olive-wash);
+  border: 1.5px solid var(--color-gold-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0 auto 12px;
+  box-shadow: 0 4px 12px rgba(197, 160, 89, 0.15);
+}
+
+.gift-icon-svg {
+  width: 24px;
+  height: 24px;
   color: var(--color-gold-deep);
 }
 
-.gift-text {
+.gift-message {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 0.98rem;
-  color: var(--color-text-muted);
+  font-size: 1.02rem;
+  color: var(--color-text-main);
   line-height: 1.5;
-  margin-bottom: 18px;
-}
-
-.bank-cards-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 380px;
-  margin: 0 auto;
-}
-
-.bank-card {
-  background: #fff;
-  border: 1px solid rgba(197, 160, 89, 0.35);
-  border-radius: 10px;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-.bank-info {
-  text-align: left;
-}
-
-.bank-name {
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-olive-dark);
-  letter-spacing: 0.5px;
-}
-
-.bank-account-num {
-  font-family: monospace;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--color-gold-deep);
-}
-
-.bank-holder {
-  font-size: 0.68rem;
-  color: var(--color-text-muted);
-}
-
-.btn-copy {
-  background: var(--color-olive-wash);
-  color: var(--color-olive-dark);
-  border: 1px solid var(--color-olive-light);
-  border-radius: 6px;
-  padding: 6px 12px;
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  transition: all 0.25s ease;
-}
-
-.btn-copy:hover {
-  background: var(--color-olive-primary);
-  color: #fff;
+  max-width: 92%;
+  margin: 8px auto 0;
 }
 
 /* ==========================================================================

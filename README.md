@@ -1,4 +1,4 @@
-# 🌿 Tarjeta de Boda Digital de Lujo • Edgar Fernando & Luisa Fernanda
+# 🌿 Tarjeta de Boda Digital de Lujo • Fernando & Luisa
 
 Invitación digital interactiva y de alta costura, inspirada en papelería botánica en **Verde Oliva Sutil**, **Oro Champagne**, un **Sobre 3D con Sello de Lacre** y la canción oficial **"Antes que el tiempo se vaya" de Fonseca & Juanes**.
 
@@ -6,11 +6,12 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
 
 ## 💍 Datos Oficiales de la Boda
 
-- **Novios:** Edgar Fernando Galvis & Luisa Fernanda Moreno Diaz
+- **Novios:** Fernando & Luisa
 - **Monograma:** F & L
 - **Fecha:** Sábado, 14 de Noviembre de 2026
 - **Ceremonia Religiosa:** Parroquia Nuestra Señora Del Carmen (Cra. 5 #18-55, Ibagué, Tolima) • **5:30 PM**
 - **Recepción & Fiesta:** Centro Vacacional Picaleña de la Policía (Av. Picaleña, Ibagué, Tolima) • **7:00 PM**
+- **Confirmación RSVP:** Antes del **13 de Octubre de 2026**
 
 ---
 
@@ -18,10 +19,10 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
 
 1. **Para los Invitados (`index.html`):**
    - **Cero botones administrativos**. El invitado sólo ve la experiencia mágica del sobre, el sello de lacre, la apertura con música y su tarjeta personalizada con su nombre y cantidad de pases.
-   - Ejemplo de enlace: `https://tuboda.com/?invitado=german-y-mary`
+   - Ejemplo de enlace: `https://boda-fernando-luisa.vercel.app/?invitado=german-y-mary`
 
 2. **Panel Privado de Novios (`novios.html`):**
-   - Página exclusiva para Edgar Fernando y Luisa Fernanda.
+   - Página exclusiva para Fernando y Luisa: `https://boda-fernando-luisa.vercel.app/novios.html`
    - Incluye el buscador de los **47 invitados** del Excel.
    - **Botón de 1 Clic para WhatsApp**: Abre WhatsApp directamente al celular del invitado con el mensaje de invitación listo y el enlace personalizado.
    - **Botón "Ver"**: Abre la tarjeta de ese invitado en una pestaña nueva.

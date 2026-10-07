@@ -11,8 +11,8 @@ const AppState = {
   isEnvelopeOpen: false,
   isMusicPlaying: false,
   weddingSettings: {
-    groom: 'Edgar Fernando',
-    bride: 'Luisa Fernanda',
+    groom: 'Fernando',
+    bride: 'Luisa',
     monogram: 'F & L',
     weddingDate: '2026-11-14T17:30',
     couplePhone: '573204545796',
@@ -38,6 +38,12 @@ document.addEventListener('DOMContentLoaded', () => {
   initCountdown();
   renderHostGuestList();
   setupEventListeners();
+  setupAutoplayTriggers();
+  attemptAutoplay();
+});
+
+window.addEventListener('load', () => {
+  attemptAutoplay();
 });
 
 // Cargar configuración guardada si existe
@@ -159,14 +165,14 @@ function resolveActiveGuest() {
 
 // Aplicar vista en Modo General (sin invitado específico)
 function applyGeneralInvitationToUI() {
-  document.title = "Boda Edgar Fernando & Luisa Fernanda 🌿";
+  document.title = "Boda Fernando & Luisa 🌿";
 
   // 1. Rótulo del Sobre
   const envIntro = document.getElementById('envGuestIntro');
   const envName = document.getElementById('envGuestName');
   const envPasses = document.getElementById('envGuestPasses');
   if (envIntro) envIntro.textContent = "Estás Cordialmente Invitado/a";
-  if (envName) envName.textContent = "Boda Edgar Fernando & Luisa Fernanda";
+  if (envName) envName.textContent = "Boda Fernando & Luisa";
   if (envPasses) envPasses.textContent = "Sábado, 14 de Noviembre de 2026 • Ibagué, Tolima";
 
   // 2. Sección Principal de la Tarjeta
@@ -252,7 +258,7 @@ function applyGuestToUI(guest) {
   updateWhatsAppRSVPLink(guest);
 
   // Actualizar título de la página
-  document.title = `Invitación para ${guest.name} • Boda Edgar Fernando & Luisa Fernanda 🌿`;
+  document.title = `Invitación para ${guest.name} • Boda Fernando & Luisa 🌿`;
 }
 
 // Actualizar el enlace directo de confirmación por WhatsApp
@@ -437,7 +443,48 @@ function getWeddingAudio() {
   return document.getElementById('weddingBgAudio');
 }
 
+function attemptAutoplay() {
+  const audio = getWeddingAudio();
+  if (!audio) return;
+  audio.volume = 0.8;
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      AppState.isMusicPlaying = true;
+      updateMusicUI(true);
+    }).catch(() => {
+      // Si el navegador bloquea el autoplay inicial sin clic, se activará en el primer gesto
+      AppState.isMusicPlaying = false;
+      updateMusicUI(false);
+    });
+  }
+}
+
+function setupAutoplayTriggers() {
+  const triggerAudio = () => {
+    if (!AppState.isMusicPlaying) {
+      playWeddingMusic();
+    }
+    removeTriggers();
+  };
+
+  const removeTriggers = () => {
+    window.removeEventListener('click', triggerAudio, true);
+    window.removeEventListener('touchstart', triggerAudio, true);
+    window.removeEventListener('pointerdown', triggerAudio, true);
+    window.removeEventListener('scroll', triggerAudio, true);
+    window.removeEventListener('keydown', triggerAudio, true);
+  };
+
+  window.addEventListener('click', triggerAudio, { capture: true, once: true });
+  window.addEventListener('touchstart', triggerAudio, { capture: true, once: true, passive: true });
+  window.addEventListener('pointerdown', triggerAudio, { capture: true, once: true });
+  window.addEventListener('scroll', triggerAudio, { capture: true, once: true, passive: true });
+  window.addEventListener('keydown', triggerAudio, { capture: true, once: true });
+}
+
 function playWeddingMusic() {
+  initAudioContext();
   const audio = getWeddingAudio();
   if (!audio) return;
 
@@ -823,7 +870,7 @@ function renderHostGuestList() {
     const s_plural = guest.passes > 1 ? 's' : '';
     
     // Mensaje personalizado de invitación para enviar al WhatsApp del invitado
-    const waInviteMessage = `¡Hola ${guest.name}! 🌿🕊️ Tenemos el inmenso honor de invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${guest.passes} persona${s_plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, fiesta y confirmar tu asistencia en tu tarjeta digital personalizada aquí:\n${cardLink}\n\n¡Esperamos contar con tu compañía en este día tan especial! 🤍\n— *${groom} & ${bride}*`;
+    const waInviteMessage = `💌 *INVITACIÓN OFICIAL DE BODA* 💍\n\n¡Hola ${guest.name}! Con inmensa alegría queremos invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${guest.passes} persona${s_plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, recepción y confirmar tu asistencia en tu tarjeta interactiva aquí:\n${cardLink}\n\n⚠️ *Por favor confirmar antes del 13 de Octubre para asegurar tu reserva.*\n\n¡Esperamos contar con tu compañía en este día tan especial! 🤍\n— *Fernando & Luisa*`;
 
     const waHref = intlPhone 
       ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waInviteMessage)}`
