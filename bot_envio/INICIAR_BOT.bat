@@ -1,46 +1,28 @@
 @echo off
-title BOT DE ENVIO DE INVITACIONES DE BODA
+title BOT DE ENVIO DE INVITACIONES DE BODA • BAILEYS
 color 0A
 cls
 echo ============================================================
-echo   BOT DE ENVIO AUTOMATICO DE INVITACIONES DE BODA
-echo   Fernando ^& Luisa Fernanda
+echo   💍 BOT DE ENVIO AUTOMATICO DE INVITACIONES DE BODA
+echo   👰🤵 Fernando ^& Luisa Fernanda
 echo ============================================================
 echo.
-echo 1. Iniciar envio a TODOS los invitados pendientes
-echo 2. Modo PRUEBA (envia solo 1 invitacion de prueba)
-echo 3. Reiniciar historial de enviados (enviar de nuevo a todos)
-echo 4. Salir
+echo  COMO FUNCIONA:
+echo  1. Este bot conecta tu propio WhatsApp (ej: 315 9649395).
+echo  2. Se abrira una ventana en tu navegador con el Codigo QR.
+echo  3. En tu celular abres WhatsApp:
+echo     Ajustes / Menu ^> Dispositivos vinculados ^> Vincular dispositivo
+echo  4. Escaneas el QR y desde ahi podras:
+echo     - Enviar una prueba a tu propio numero para verificar.
+echo     - Iniciar el envio masivo a los 52 invitados automaticamente.
 echo.
-set /p opcion="Elige una opcion (1, 2, 3 o 4): "
+echo ============================================================
+echo  Iniciando servidor del bot...
+echo ============================================================
+echo.
 
-if "%opcion%"=="1" (
-    echo.
-    echo Iniciando bot de envio...
-    node enviar_boda.js
-    pause
-    exit
-)
+node enviar_boda.js
 
-if "%opcion%"=="2" (
-    echo.
-    echo Iniciando modo de prueba (1 mensaje)...
-    node enviar_boda.js --test
-    pause
-    exit
-)
-
-if "%opcion%"=="3" (
-    echo.
-    echo Reiniciando lista de enviados...
-    node enviar_boda.js --reset
-    pause
-    exit
-)
-
-if "%opcion%"=="4" (
-    exit
-)
-
-echo Opcion invalida.
+echo.
+echo El proceso ha terminado.
 pause
