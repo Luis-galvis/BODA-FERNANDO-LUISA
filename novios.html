@@ -21,6 +21,9 @@
       --color-paper: #faf8f4;
       --color-text-main: #242b1d;
       --color-text-muted: #57634c;
+      --color-success: #2e7d32;
+      --color-danger: #c62828;
+      --color-warning: #ef6c00;
       --font-serif: 'Cormorant Garamond', Georgia, serif;
       --font-display: 'Cinzel', Georgia, serif;
       --font-sans: 'Montserrat', sans-serif;
@@ -58,8 +61,8 @@
     }
 
     .admin-logo-circle {
-      width: 42px;
-      height: 42px;
+      width: 44px;
+      height: 44px;
       border-radius: 50%;
       background: radial-gradient(circle, #fffdf8, #ecd8a5);
       color: var(--color-gold-deep);
@@ -84,6 +87,12 @@
       color: var(--color-gold-light);
     }
 
+    .nav-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
     .btn-nav-preview {
       background: var(--color-gold-primary);
       color: #fff;
@@ -105,7 +114,7 @@
 
     /* Contenedor Principal */
     .admin-container {
-      max-width: 1080px;
+      max-width: 1140px;
       margin: 28px auto;
       padding: 0 20px;
     }
@@ -113,21 +122,37 @@
     /* Tarjetas de Resumen */
     .metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
-      margin-bottom: 28px;
+      margin-bottom: 24px;
     }
 
     .metric-card {
       background: #fff;
       border: 1px solid #dce2d7;
       border-radius: 12px;
-      padding: 20px;
+      padding: 18px 20px;
       box-shadow: 0 4px 12px rgba(44, 56, 33, 0.04);
       display: flex;
       flex-direction: column;
       gap: 6px;
+      position: relative;
+      overflow: hidden;
     }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--color-gold-primary);
+    }
+
+    .metric-card.card-success::before { background: var(--color-success); }
+    .metric-card.card-warning::before { background: var(--color-warning); }
+    .metric-card.card-danger::before { background: var(--color-danger); }
 
     .metric-label {
       font-size: 0.72rem;
@@ -157,12 +182,13 @@
       margin-bottom: 22px;
       border-bottom: 2px solid #e1e6dd;
       padding-bottom: 10px;
+      flex-wrap: wrap;
     }
 
     .tab-btn {
       background: transparent;
       border: none;
-      padding: 10px 20px;
+      padding: 10px 18px;
       font-family: var(--font-sans);
       font-size: 0.85rem;
       font-weight: 600;
@@ -170,6 +196,9 @@
       border-radius: 8px;
       cursor: pointer;
       transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
 
     .tab-btn.active {
@@ -178,7 +207,19 @@
       box-shadow: 0 4px 12px rgba(82, 99, 64, 0.25);
     }
 
-    /* Buscador y Filtros */
+    .tab-badge {
+      background: rgba(255, 255, 255, 0.25);
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 0.72rem;
+    }
+
+    .tab-btn:not(.active) .tab-badge {
+      background: var(--color-olive-wash);
+      color: var(--color-olive-dark);
+    }
+
+    /* Barra de Búsqueda y Filtros */
     .search-filter-box {
       background: #fff;
       border: 1px solid #dce2d7;
@@ -186,8 +227,14 @@
       padding: 16px;
       margin-bottom: 20px;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       gap: 14px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
       align-items: center;
       justify-content: space-between;
     }
@@ -224,18 +271,47 @@
       color: #8c9684;
     }
 
-    .filter-pills {
+    .btn-export {
+      background: var(--color-olive-wash);
+      border: 1px solid var(--color-olive-subtle);
+      color: var(--color-olive-dark);
+      padding: 9px 16px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-export:hover {
+      background: var(--color-olive-primary);
+      color: #fff;
+    }
+
+    .filter-pills-row {
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .filter-group-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--color-text-muted);
+      margin-right: 4px;
     }
 
     .pill-btn {
       background: var(--color-olive-wash);
       border: 1px solid var(--color-olive-subtle);
       color: var(--color-olive-dark);
-      padding: 6px 14px;
-      border-radius: 20px;
+      padding: 5px 12px;
+      border-radius: 16px;
       font-size: 0.75rem;
       font-weight: 600;
       cursor: pointer;
@@ -251,14 +327,14 @@
     /* Lista de Invitados */
     .guests-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
       gap: 16px;
     }
 
     .guest-card {
       background: #fff;
       border: 1px solid #dfe5da;
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 18px 20px;
       box-shadow: 0 4px 14px rgba(44, 56, 33, 0.04);
       display: flex;
@@ -269,8 +345,8 @@
     }
 
     .guest-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 22px rgba(44, 56, 33, 0.1);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(44, 56, 33, 0.09);
       border-color: var(--color-gold-light);
     }
 
@@ -299,11 +375,65 @@
     .badge-passes {
       background: var(--color-olive-primary);
       color: #fff;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 700;
       padding: 3px 10px;
       border-radius: 14px;
       white-space: nowrap;
+    }
+
+    /* Selector de Estado RSVP en la tarjeta */
+    .guest-status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #fafbfa;
+      border-radius: 8px;
+      border: 1px solid #edf1ea;
+    }
+
+    .status-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+
+    .status-btns {
+      display: flex;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .btn-status-toggle {
+      flex: 1;
+      padding: 4px 6px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      border-radius: 6px;
+      border: 1px solid #d4dbce;
+      background: #fff;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-status-toggle.active-pending {
+      background: #fff3e0;
+      border-color: #ffb74d;
+      color: #e65100;
+    }
+
+    .btn-status-toggle.active-confirmed {
+      background: #e8f5e9;
+      border-color: #81c784;
+      color: #2e7d32;
+    }
+
+    .btn-status-toggle.active-declined {
+      background: #ffebee;
+      border-color: #e57373;
+      color: #c62828;
     }
 
     .guest-actions {
@@ -360,6 +490,116 @@
       background: #1eb956;
       transform: translateY(-1px);
       box-shadow: 0 6px 14px rgba(37, 211, 102, 0.35);
+    }
+
+    /* Pestaña de Confirmaciones Online */
+    .rsvp-online-panel {
+      background: #fff;
+      border: 1px solid #dce2d7;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 4px 16px rgba(44, 56, 33, 0.05);
+    }
+
+    .rsvp-online-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #edf1ea;
+    }
+
+    .rsvp-online-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      color: var(--color-olive-dark);
+    }
+
+    .rsvp-sync-btn {
+      background: var(--color-olive-primary);
+      color: #fff;
+      border: none;
+      padding: 9px 18px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .rsvp-sync-btn:hover {
+      background: var(--color-olive-dark);
+    }
+
+    .rsvp-confirmations-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .rsvp-item-card {
+      background: #fafbfa;
+      border: 1px solid #e1e6dd;
+      border-radius: 10px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .rsvp-item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .rsvp-item-name {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--color-olive-dark);
+    }
+
+    .rsvp-item-date {
+      font-size: 0.72rem;
+      color: var(--color-text-muted);
+    }
+
+    .rsvp-item-msg {
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--color-olive-primary);
+      margin-top: 4px;
+    }
+
+    .rsvp-status-badge {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-yes {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+    }
+
+    .badge-no {
+      background: #ffebee;
+      color: #c62828;
+      border: 1px solid #ef9a9a;
     }
 
     /* Formularios */
@@ -456,63 +696,94 @@
         <p>Boda Edgar Fernando Galvis & Luisa Fernanda Moreno Diaz 🌿</p>
       </div>
     </div>
-    <a href="index.html" target="_blank" class="btn-nav-preview">
-      <span>✉️ Ver Tarjeta General</span>
-    </a>
+    <div class="nav-actions">
+      <a href="index.html" target="_blank" class="btn-nav-preview">
+        <span>✉️ Ver Tarjeta General</span>
+      </a>
+    </div>
   </header>
 
   <main class="admin-container">
 
-    <!-- Tarjetas Métricas -->
+    <!-- Tarjetas Métricas Dinámicas -->
     <section class="metrics-grid">
       <div class="metric-card">
-        <span class="metric-label">Tarjetas de Invitación</span>
-        <span class="metric-value">47</span>
-        <span class="metric-desc">Familias, parejas e individuales</span>
+        <span class="metric-label">Invitaciones del Excel</span>
+        <span class="metric-value" id="kpiTotalCards">47</span>
+        <span class="metric-desc">Pases totales: <strong id="kpiTotalPasses">87</strong> personas</span>
+      </div>
+
+      <div class="metric-card card-success">
+        <span class="metric-label">Confirmados</span>
+        <span class="metric-value" style="color: var(--color-success);" id="kpiConfirmed">0</span>
+        <span class="metric-desc" id="kpiConfirmedPasses">0 personas confirmadas</span>
+      </div>
+
+      <div class="metric-card card-warning">
+        <span class="metric-label">Por Confirmar</span>
+        <span class="metric-value" style="color: var(--color-warning);" id="kpiPending">47</span>
+        <span class="metric-desc" id="kpiPendingPasses">87 personas pendientes</span>
+      </div>
+
+      <div class="metric-card card-danger">
+        <span class="metric-label">No Asistirán</span>
+        <span class="metric-value" style="color: var(--color-danger);" id="kpiDeclined">0</span>
+        <span class="metric-desc" id="kpiDeclinedPasses">0 personas declinadas</span>
       </div>
 
       <div class="metric-card">
-        <span class="metric-label">Pases Totales Asignados</span>
-        <span class="metric-value">87</span>
-        <span class="metric-desc">Personas invitadas en total</span>
-      </div>
-
-      <div class="metric-card">
-        <span class="metric-label">Fecha del Matrimonio</span>
-        <span class="metric-value" style="font-size: 1.45rem;">14 Nov 2026</span>
-        <span class="metric-desc">Sábado • Ibagué, Tolima</span>
-      </div>
-
-      <div class="metric-card">
-        <span class="metric-label">Ceremonia</span>
-        <span class="metric-value" style="font-size: 1.15rem;">Ntra. Sra. Del Carmen</span>
-        <span class="metric-desc">Cra. 5 #18-55, Ibagué</span>
+        <span class="metric-label">Horarios Oficiales</span>
+        <span class="metric-value" style="font-size: 1.15rem; color: var(--color-gold-deep);">5:30 PM & 7:00 PM</span>
+        <span class="metric-desc">Ceremonia 5:30 PM • Recepción 7:00 PM</span>
       </div>
     </section>
 
     <!-- Pestañas -->
     <nav class="admin-tabs">
-      <button class="tab-btn active" onclick="switchTab('tab-guests')">📋 Lista de Invitados (47)</button>
-      <button class="tab-btn" onclick="switchTab('tab-settings')">⚙️ Configuración de la Boda</button>
-      <button class="tab-btn" onclick="switchTab('tab-custom')">✨ Generar Enlace Nuevo</button>
+      <button class="tab-btn active" onclick="switchTab('tab-guests')">
+        <span>📋 Lista de Invitados</span>
+        <span class="tab-badge" id="tabBadgeGuests">47</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-rsvp')">
+        <span>💌 Confirmaciones Online</span>
+        <span class="tab-badge" id="tabBadgeRSVP">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-custom')">
+        <span>✨ Generar Nuevo Enlace</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-settings')">
+        <span>⚙️ Configuración de la Boda</span>
+      </button>
     </nav>
 
-    <!-- PESTAÑA 1: LISTA DE LOS 47 INVITADOS CON ENVÍO WHATSAPP DIRECTO -->
+    <!-- PESTAÑA 1: LISTA DE LOS 47 INVITADOS CON ENVÍO WHATSAPP DIRECTO Y ESTADO -->
     <section id="tab-guests" class="tab-content">
       <div class="search-filter-box">
-        <div class="search-input-wrap">
-          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <input type="text" class="search-input" id="adminSearchInput" placeholder="Buscar por nombre del invitado o celular..." oninput="renderGuests()">
+        <div class="search-row">
+          <div class="search-input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" class="search-input" id="adminSearchInput" placeholder="Buscar por nombre del invitado o celular..." oninput="renderGuests()">
+          </div>
+          <button class="btn-export" onclick="exportGuestsToCSV()">
+            📥 Exportar Lista a Excel (CSV)
+          </button>
         </div>
 
-        <div class="filter-pills">
-          <button class="pill-btn active" onclick="setFilter('all', this)">Todos (47)</button>
-          <button class="pill-btn" onclick="setFilter('1', this)">1 Pase</button>
-          <button class="pill-btn" onclick="setFilter('2', this)">2 Pases</button>
-          <button class="pill-btn" onclick="setFilter('multi', this)">3 a 5 Pases</button>
+        <div class="filter-pills-row">
+          <span class="filter-group-title">Pases:</span>
+          <button class="pill-btn active" onclick="setPassFilter('all', this)">Todos (47)</button>
+          <button class="pill-btn" onclick="setPassFilter('1', this)">1 Pase</button>
+          <button class="pill-btn" onclick="setPassFilter('2', this)">2 Pases</button>
+          <button class="pill-btn" onclick="setPassFilter('multi', this)">3 a 5 Pases</button>
+
+          <span class="filter-group-title" style="margin-left: 14px;">Estado:</span>
+          <button class="pill-btn active" onclick="setStatusFilter('all', this)">Todos</button>
+          <button class="pill-btn" onclick="setStatusFilter('confirmed', this)">✅ Confirmados</button>
+          <button class="pill-btn" onclick="setStatusFilter('pending', this)">⏳ Pendientes</button>
+          <button class="pill-btn" onclick="setStatusFilter('declined', this)">❌ No Asisten</button>
         </div>
       </div>
 
@@ -521,73 +792,29 @@
       </div>
     </section>
 
-    <!-- PESTAÑA 2: CONFIGURACIÓN DE LA BODA -->
-    <section id="tab-settings" class="tab-content" style="display: none;">
-      <div class="form-panel">
-        <h2 style="font-family: var(--font-serif); font-size: 1.6rem; margin-bottom: 18px; color: var(--color-olive-dark);">
-          Editar Datos Oficiales de la Boda
-        </h2>
-        <form onsubmit="handleSaveSettings(event)">
-          <div class="form-group">
-            <label class="form-label">Nombre del Novio:</label>
-            <input type="text" class="form-input" id="setGroom" value="Edgar Fernando">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nombre de la Novia:</label>
-            <input type="text" class="form-input" id="setBride" value="Luisa Fernanda">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Monograma (Iniciales):</label>
-            <input type="text" class="form-input" id="setMonogram" value="F & L">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Fecha y Hora de la Boda:</label>
-            <input type="datetime-local" class="form-input" id="setDate" value="2026-11-14T15:30">
-          </div>
-          <div class="form-group">
-            <label class="form-label">WhatsApp de los Novios para Confirmaciones (sin +):</label>
-            <input type="text" class="form-input" id="setPhone" value="573204545796">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Lugar de la Ceremonia:</label>
-            <input type="text" class="form-input" id="setCeremony" value="Parroquia Nuestra Señora Del Carmen">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Dirección de la Ceremonia:</label>
-            <input type="text" class="form-input" id="setCeremonyAddr" value="Cra. 5 #18-55, Ibagué, Tolima">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Lugar de la Recepción:</label>
-            <input type="text" class="form-input" id="setReception" value="Centro Vacacional Picaleña de la Policía">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Dirección de la Recepción:</label>
-            <input type="text" class="form-input" id="setReceptionAddr" value="Av. Picaleña, Ibagué, Tolima">
-          </div>
-
-          <!-- SECCIÓN DE HUELLITAS DE NUESTRO PERRIJO (PERSONALIZABLE) -->
-          <div class="form-group" style="margin-top: 18px; padding: 16px; background: #faf9f5; border: 1.5px dashed var(--color-gold-primary); border-radius: 12px;">
-            <label class="form-label" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--color-olive-dark);">
-              🐾 <span>Huellitas de Nuestro Perrhijo (Mascota)</span>
-            </label>
-            <p style="font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 12px; line-height: 1.4;">
-              Actualmente se muestran unas huellitas doradas genéricas. Puedes subir la foto de las huellitas de tu perrito aquí mismo para verla en la invitación, o reemplazar directamente el archivo <code>assets/dog_paws.png</code> en la carpeta.
+    <!-- PESTAÑA 2: CONFIRMACIONES ONLINE RECIBIDAS (RSVP EN TIEMPO REAL) -->
+    <section id="tab-rsvp" class="tab-content" style="display: none;">
+      <div class="rsvp-online-panel">
+        <div class="rsvp-online-header">
+          <div>
+            <h2 class="rsvp-online-title">Confirmaciones Recibidas desde la Tarjeta</h2>
+            <p style="font-size: 0.8rem; color: var(--color-text-muted);">
+              Aquí aparecen las personas que han confirmado asistencia a través de su tarjeta digital.
             </p>
-            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-              <div style="width: 60px; height: 60px; border-radius: 10px; border: 1px solid #d4c8a8; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
-                <img id="adminDogPawsPreview" src="assets/dog_paws.png" alt="Preview Huellitas" style="max-width: 100%; max-height: 100%; object-fit: contain;">
-              </div>
-              <div style="flex: 1; min-width: 180px;">
-                <input type="file" id="pawsFileInput" accept="image/*" class="form-input" style="font-size: 0.78rem; padding: 8px;" onchange="handlePawsUpload(event)">
-              </div>
-              <button type="button" class="btn-action" style="background: #e4dfd3; color: #4a5440; font-size: 0.75rem; padding: 9px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="resetDogPaws()">
-                Restablecer Huellitas
-              </button>
-            </div>
           </div>
+          <div style="display: flex; gap: 8px;">
+            <button class="rsvp-sync-btn" onclick="fetchCloudConfirmations()">
+              🔄 Sincronizar en Vivo
+            </button>
+            <button class="btn-export" onclick="exportRSVPToCSV()">
+              📥 Descargar Reporte (CSV)
+            </button>
+          </div>
+        </div>
 
-          <button type="submit" class="btn-submit" style="margin-top: 14px;">💾 Guardar Cambios</button>
-        </form>
+        <div id="rsvpConfirmationsContainer" class="rsvp-confirmations-list">
+          <!-- Renderizado dinámicamente con JS -->
+        </div>
       </div>
     </section>
 
@@ -622,6 +849,76 @@
       </div>
     </section>
 
+    <!-- PESTAÑA 4: CONFIGURACIÓN DE LA BODA -->
+    <section id="tab-settings" class="tab-content" style="display: none;">
+      <div class="form-panel">
+        <h2 style="font-family: var(--font-serif); font-size: 1.6rem; margin-bottom: 18px; color: var(--color-olive-dark);">
+          Editar Datos Oficiales de la Boda
+        </h2>
+        <form onsubmit="handleSaveSettings(event)">
+          <div class="form-group">
+            <label class="form-label">Nombre del Novio:</label>
+            <input type="text" class="form-input" id="setGroom" value="Edgar Fernando">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nombre de la Novia:</label>
+            <input type="text" class="form-input" id="setBride" value="Luisa Fernanda">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Monograma (Iniciales):</label>
+            <input type="text" class="form-input" id="setMonogram" value="F & L">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fecha y Hora de la Boda (Ceremonia):</label>
+            <input type="datetime-local" class="form-input" id="setDate" value="2026-11-14T17:30">
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp de los Novios para Confirmaciones (sin +):</label>
+            <input type="text" class="form-input" id="setPhone" value="573204545796">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lugar de la Ceremonia (5:30 PM):</label>
+            <input type="text" class="form-input" id="setCeremony" value="Parroquia Nuestra Señora Del Carmen">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dirección de la Ceremonia:</label>
+            <input type="text" class="form-input" id="setCeremonyAddr" value="Cra. 5 #18-55, Ibagué, Tolima">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Lugar de la Recepción (7:00 PM):</label>
+            <input type="text" class="form-input" id="setReception" value="Centro Vacacional Picaleña de la Policía">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dirección de la Recepción:</label>
+            <input type="text" class="form-input" id="setReceptionAddr" value="Av. Picaleña, Ibagué, Tolima">
+          </div>
+
+          <!-- SECCIÓN DE HUELLITAS DE NUESTRO PERRIJO (PERSONALIZABLE) -->
+          <div class="form-group" style="margin-top: 18px; padding: 16px; background: #faf9f5; border: 1.5px dashed var(--color-gold-primary); border-radius: 12px;">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--color-olive-dark);">
+              🐾 <span>Huellitas de Nuestro Perrhijo (Mascota)</span>
+            </label>
+            <p style="font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 12px; line-height: 1.4;">
+              Puedes subir la foto de las huellitas de tu perrito aquí mismo para verla en la invitación, o reemplazar directamente el archivo <code>assets/dog_paws.png</code> en la carpeta.
+            </p>
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+              <div style="width: 60px; height: 60px; border-radius: 10px; border: 1px solid #d4c8a8; background: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 4px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);">
+                <img id="adminDogPawsPreview" src="assets/dog_paws.png" alt="Preview Huellitas" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+              </div>
+              <div style="flex: 1; min-width: 180px;">
+                <input type="file" id="pawsFileInput" accept="image/*" class="form-input" style="font-size: 0.78rem; padding: 8px;" onchange="handlePawsUpload(event)">
+              </div>
+              <button type="button" class="btn-action" style="background: #e4dfd3; color: #4a5440; font-size: 0.75rem; padding: 9px 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;" onclick="resetDogPaws()">
+                Restablecer Huellitas
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit" style="margin-top: 14px;">💾 Guardar Cambios</button>
+        </form>
+      </div>
+    </section>
+
   </main>
 
   <div class="toast" id="adminToast">¡Enlace copiado!</div>
@@ -629,7 +926,31 @@
   <script type="module">
     import { GUESTS } from './data/guests.js';
 
-    let currentFilter = 'all';
+    let currentPassFilter = 'all';
+    let currentStatusFilter = 'all';
+    let guestStatuses = {};
+    let cloudConfirmations = [];
+
+    // Cargar estados guardados de los invitados (confirmado, pendiente, declinado)
+    function loadGuestStatuses() {
+      try {
+        const saved = localStorage.getItem('wedding_guest_rsvp_statuses');
+        if (saved) {
+          guestStatuses = JSON.parse(saved);
+        }
+      } catch (e) {
+        guestStatuses = {};
+      }
+    }
+
+    function saveGuestStatuses() {
+      try {
+        localStorage.setItem('wedding_guest_rsvp_statuses', JSON.stringify(guestStatuses));
+      } catch (e) {
+        console.error(e);
+      }
+      updateKPICounters();
+    }
 
     window.switchTab = function(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -639,14 +960,78 @@
       if (activeBtn) activeBtn.classList.add('active');
       const content = document.getElementById(tabId);
       if (content) content.style.display = 'block';
+
+      if (tabId === 'tab-rsvp') {
+        fetchCloudConfirmations();
+      }
     };
 
-    window.setFilter = function(filter, btn) {
-      currentFilter = filter;
-      document.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+    window.setPassFilter = function(filter, btn) {
+      currentPassFilter = filter;
+      btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderGuests();
     };
+
+    window.setStatusFilter = function(filter, btn) {
+      currentStatusFilter = filter;
+      btn.parentElement.querySelectorAll('.pill-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderGuests();
+    };
+
+    window.setGuestStatus = function(guestId, status) {
+      guestStatuses[guestId] = status;
+      saveGuestStatuses();
+      renderGuests();
+      showAdminToast(`Estado de invitado actualizado`);
+    };
+
+    // Actualizar contadores y tarjetas de resumen
+    function updateKPICounters() {
+      let totalPasses = 0;
+      let confirmedGuests = 0;
+      let confirmedPasses = 0;
+      let pendingGuests = 0;
+      let pendingPasses = 0;
+      let declinedGuests = 0;
+      let declinedPasses = 0;
+
+      GUESTS.forEach(g => {
+        const p = g.passes || 1;
+        totalPasses += p;
+        const st = guestStatuses[g.id] || 'pending';
+
+        if (st === 'confirmed') {
+          confirmedGuests++;
+          confirmedPasses += p;
+        } else if (st === 'declined') {
+          declinedGuests++;
+          declinedPasses += p;
+        } else {
+          pendingGuests++;
+          pendingPasses += p;
+        }
+      });
+
+      const kpiTotalCards = document.getElementById('kpiTotalCards');
+      const kpiTotalPasses = document.getElementById('kpiTotalPasses');
+      const kpiConfirmed = document.getElementById('kpiConfirmed');
+      const kpiConfirmedPasses = document.getElementById('kpiConfirmedPasses');
+      const kpiPending = document.getElementById('kpiPending');
+      const kpiPendingPasses = document.getElementById('kpiPendingPasses');
+      const kpiDeclined = document.getElementById('kpiDeclined');
+      const kpiDeclinedPasses = document.getElementById('kpiDeclinedPasses');
+
+      if (kpiTotalCards) kpiTotalCards.textContent = GUESTS.length;
+      if (kpiTotalPasses) kpiTotalPasses.textContent = totalPasses;
+      if (kpiConfirmed) kpiConfirmed.textContent = confirmedGuests;
+      if (kpiConfirmedPasses) kpiConfirmedPasses.textContent = `${confirmedPasses} personas confirmadas`;
+      if (kpiPending) kpiPending.textContent = pendingGuests;
+      if (kpiPendingPasses) kpiPendingPasses.textContent = `${pendingPasses} personas pendientes`;
+      if (kpiDeclined) kpiDeclined.textContent = declinedGuests;
+      if (kpiDeclinedPasses) kpiDeclinedPasses.textContent = `${declinedPasses} personas no asisten`;
+    }
 
     window.renderGuests = function() {
       const container = document.getElementById('adminGuestsGrid');
@@ -655,17 +1040,25 @@
       const filtered = GUESTS.filter(g => {
         const matchesSearch = g.name.toLowerCase().includes(search) || (g.phone && g.phone.includes(search));
         if (!matchesSearch) return false;
-        if (currentFilter === 'all') return true;
-        if (currentFilter === '1') return g.passes === 1;
-        if (currentFilter === '2') return g.passes === 2;
-        if (currentFilter === 'multi') return g.passes >= 3;
+
+        // Filtro de pases
+        if (currentPassFilter === '1' && g.passes !== 1) return false;
+        if (currentPassFilter === '2' && g.passes !== 2) return false;
+        if (currentPassFilter === 'multi' && g.passes < 3) return false;
+
+        // Filtro de estado
+        const st = guestStatuses[g.id] || 'pending';
+        if (currentStatusFilter === 'confirmed' && st !== 'confirmed') return false;
+        if (currentStatusFilter === 'pending' && st !== 'pending') return false;
+        if (currentStatusFilter === 'declined' && st !== 'declined') return false;
+
         return true;
       });
 
       container.innerHTML = '';
 
       if (filtered.length === 0) {
-        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-muted);">No se encontraron invitados con "${search}"</div>`;
+        container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--color-text-muted);">No se encontraron invitados con los filtros aplicados.</div>`;
         return;
       }
 
@@ -679,6 +1072,7 @@
         const cleanPhone = g.phone ? g.phone.replace(/\D/g, '') : '';
         const intlPhone = cleanPhone ? (cleanPhone.startsWith('57') ? cleanPhone : `57${cleanPhone}`) : '';
         const plural = g.passes > 1 ? 's' : '';
+        const currentSt = guestStatuses[g.id] || 'pending';
 
         const waMsg = `¡Hola ${g.name}! 🌿🕊️ Tenemos el inmenso honor de invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${g.passes} persona${plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, recepción y confirmar tu asistencia en tu tarjeta digital aquí:\n${cardLink}\n\n¡Esperamos de todo corazón contar con tu compañía! 🤍\n— *Edgar Fernando & Luisa Fernanda*`;
 
@@ -692,7 +1086,23 @@
               <div class="guest-name">${g.name}</div>
               <span class="badge-passes">${g.passes} ${g.passes === 1 ? 'Pase' : 'Pases'}</span>
             </div>
-            <div class="guest-phone">${g.phone ? '📱 +57 ' + g.phone : 'Sin teléfono'}</div>
+            <div class="guest-phone">${g.phone ? '📱 +57 ' + g.phone : 'Sin teléfono en Excel'}</div>
+          </div>
+
+          <!-- Selector de Estado RSVP -->
+          <div class="guest-status-row">
+            <span class="status-label">Estado:</span>
+            <div class="status-btns">
+              <button class="btn-status-toggle ${currentSt === 'pending' ? 'active-pending' : ''}" onclick="setGuestStatus(${g.id}, 'pending')" title="Pendiente por confirmar">
+                ⏳ Pendiente
+              </button>
+              <button class="btn-status-toggle ${currentSt === 'confirmed' ? 'active-confirmed' : ''}" onclick="setGuestStatus(${g.id}, 'confirmed')" title="Confirmó asistencia">
+                ✅ Asiste
+              </button>
+              <button class="btn-status-toggle ${currentSt === 'declined' ? 'active-declined' : ''}" onclick="setGuestStatus(${g.id}, 'declined')" title="No asistirá">
+                ❌ No Asiste
+              </button>
+            </div>
           </div>
 
           <div class="guest-actions">
@@ -712,6 +1122,167 @@
       });
     };
 
+    // =========================================================================
+    // CONFIRMACIONES ONLINE (RSVP EN TIEMPO REAL DESDE NTFY.SH + LOCAL)
+    // =========================================================================
+    window.fetchCloudConfirmations = function() {
+      const container = document.getElementById('rsvpConfirmationsContainer');
+      const badge = document.getElementById('tabBadgeRSVP');
+      if (container) {
+        container.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);">Sincronizando confirmaciones en línea...</div>`;
+      }
+
+      // 1. Obtener de localStorage primero
+      let localList = [];
+      try {
+        localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
+      } catch (e) {
+        localList = [];
+      }
+
+      // 2. Consultar mensajes en la nube de ntfy.sh
+      fetch('https://ntfy.sh/boda-edgar-fernando-luisa-fernanda-rsvp-2026/json?poll=1')
+        .then(res => res.text())
+        .then(text => {
+          const lines = text.trim().split('\n').filter(Boolean);
+          const cloudList = [];
+
+          lines.forEach(l => {
+            try {
+              const data = JSON.parse(l);
+              if (data.event === 'message' && data.message) {
+                const parsed = JSON.parse(data.message);
+                cloudList.push(parsed);
+              }
+            } catch (err) {
+              // si el mensaje es texto plano
+            }
+          });
+
+          // Combinar y eliminar duplicados por nombre y fecha
+          const combined = [...localList];
+          cloudList.forEach(c => {
+            const exists = combined.some(x => x.name === c.name && Math.abs(new Date(x.date || 0) - new Date(c.date || 0)) < 10000);
+            if (!exists) combined.push(c);
+          });
+
+          cloudConfirmations = combined.reverse(); // más recientes primero
+          renderConfirmationsList();
+          if (badge) badge.textContent = cloudConfirmations.length;
+        })
+        .catch(err => {
+          console.warn('Error fetching cloud confirmations:', err);
+          cloudConfirmations = localList.reverse();
+          renderConfirmationsList();
+          if (badge) badge.textContent = cloudConfirmations.length;
+        });
+    };
+
+    function renderConfirmationsList() {
+      const container = document.getElementById('rsvpConfirmationsContainer');
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (cloudConfirmations.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; padding: 40px; color: var(--color-text-muted); background: #fafbfa; border-radius: 10px; border: 1px dashed #dce2d7;">
+            <p style="font-size: 1.1rem; margin-bottom: 6px;">Aún no hay confirmaciones registradas en línea.</p>
+            <p style="font-size: 0.8rem;">Cuando un invitado complete el formulario "¿Nos Acompañas?" en su tarjeta, aparecerá aquí inmediatamente.</p>
+          </div>
+        `;
+        return;
+      }
+
+      cloudConfirmations.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'rsvp-item-card';
+
+        const isYes = item.attendance === 'si';
+        const formattedDate = item.date ? new Date(item.date).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : 'Reciente';
+
+        // Intentar encontrar coincidencia en la lista de los 47 invitados
+        const matchedGuest = GUESTS.find(g => g.name.toLowerCase().includes(item.name.toLowerCase()) || item.name.toLowerCase().includes(g.name.toLowerCase()));
+
+        div.innerHTML = `
+          <div class="rsvp-item-left">
+            <div class="rsvp-item-name">${item.name}</div>
+            <div class="rsvp-item-date">📅 Recibido: ${formattedDate}</div>
+            ${item.message ? `<div class="rsvp-item-msg">💬 "${item.message}"</div>` : ''}
+          </div>
+
+          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+            <span class="rsvp-status-badge ${isYes ? 'badge-yes' : 'badge-no'}">
+              ${isYes ? '✅ Asistirá con alegría' : '❌ No podrá asistir'}
+            </span>
+
+            ${matchedGuest ? `
+              <button class="btn-action btn-preview" style="padding: 6px 12px; font-size: 0.72rem;" onclick="markGuestFromRSVP(${matchedGuest.id}, '${isYes ? 'confirmed' : 'declined'}')">
+                ✓ Sincronizar en Lista (${matchedGuest.name})
+              </button>
+            ` : ''}
+          </div>
+        `;
+
+        container.appendChild(div);
+      });
+    }
+
+    window.markGuestFromRSVP = function(guestId, status) {
+      guestStatuses[guestId] = status;
+      saveGuestStatuses();
+      renderGuests();
+      showAdminToast('✓ Invitado sincronizado en la lista oficial');
+    };
+
+    // =========================================================================
+    // EXPORTACIÓN A EXCEL / CSV
+    // =========================================================================
+    window.exportGuestsToCSV = function() {
+      let csv = 'ID,Nombre Invitado,Pases Reservados,Telefono,Estado Confirmacion,Enlace Tarjeta\n';
+      const baseUrl = window.location.origin + window.location.pathname.replace('novios.html', 'index.html');
+
+      GUESTS.forEach(g => {
+        const st = guestStatuses[g.id] || 'pending';
+        const stText = st === 'confirmed' ? 'Confirmado' : st === 'declined' ? 'No Asiste' : 'Pendiente';
+        const link = `${baseUrl}?invitado=${g.slug}`;
+        csv += `"${g.id}","${g.name.replace(/"/g, '""')}","${g.passes}","${g.phone || ''}","${stText}","${link}"\n`;
+      });
+
+      downloadCSV(csv, 'lista_invitados_boda_edgar_y_luisa.csv');
+      showAdminToast('📥 Descargando lista de invitados en CSV');
+    };
+
+    window.exportRSVPToCSV = function() {
+      if (cloudConfirmations.length === 0) {
+        alert('No hay confirmaciones para exportar todavía.');
+        return;
+      }
+
+      let csv = 'Nombre,Respuesta,Fecha y Hora,Mensaje\n';
+      cloudConfirmations.forEach(c => {
+        const resp = c.attendance === 'si' ? 'Asiste' : 'No asiste';
+        csv += `"${(c.name || '').replace(/"/g, '""')}","${resp}","${c.date || ''}","${(c.message || '').replace(/"/g, '""')}"\n`;
+      });
+
+      downloadCSV(csv, 'confirmaciones_rsvp_boda.csv');
+      showAdminToast('📥 Descargando confirmaciones en CSV');
+    };
+
+    function downloadCSV(csvContent, filename) {
+      const blob = new Blob(["\uFEFF" + csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // =========================================================================
+    // CONFIGURACIÓN Y GENERADOR DE ENLACES
+    // =========================================================================
     window.handleSaveSettings = function(e) {
       e.preventDefault();
       const settings = {
@@ -800,7 +1371,11 @@
       if (preview) preview.src = savedPaws;
     }
 
+    // Inicialización
+    loadGuestStatuses();
+    updateKPICounters();
     renderGuests();
+    fetchCloudConfirmations();
   </script>
 </body>
 </html>

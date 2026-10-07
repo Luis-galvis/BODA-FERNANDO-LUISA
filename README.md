@@ -1,6 +1,6 @@
 # 🌿 Tarjeta de Boda Digital de Lujo • Edgar Fernando & Luisa Fernanda
 
-Invitación digital interactiva y de alta costura, inspirada en papelería botánica en **Verde Oliva Sutil**, **Oro Champagne** y un **Sobre 3D con Sello de Lacre y Música de Arpa**.
+Invitación digital interactiva y de alta costura, inspirada en papelería botánica en **Verde Oliva Sutil**, **Oro Champagne**, un **Sobre 3D con Sello de Lacre** y la canción oficial **"Antes que el tiempo se vaya" de Fonseca & Juanes**.
 
 ---
 
@@ -8,9 +8,9 @@ Invitación digital interactiva y de alta costura, inspirada en papelería botá
 
 - **Novios:** Edgar Fernando Galvis & Luisa Fernanda Moreno Diaz
 - **Monograma:** F & L
-- **Fecha:** Sábado, 14 de Noviembre de 2026 (3:30 PM)
-- **Ceremonia Religiosa:** Parroquia Nuestra Señora Del Carmen (Cra. 5 #18-55, Ibagué, Tolima)
-- **Recepción & Fiesta:** Centro Vacacional Picaleña de la Policía (Av. Picaleña, Ibagué, Tolima)
+- **Fecha:** Sábado, 14 de Noviembre de 2026
+- **Ceremonia Religiosa:** Parroquia Nuestra Señora Del Carmen (Cra. 5 #18-55, Ibagué, Tolima) • **5:30 PM**
+- **Recepción & Fiesta:** Centro Vacacional Picaleña de la Policía (Av. Picaleña, Ibagué, Tolima) • **7:00 PM**
 
 ---
 

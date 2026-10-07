@@ -1086,9 +1086,9 @@ body {
 
 .timeline-list {
   position: relative;
-  max-width: 380px;
+  max-width: 420px;
   margin: 20px auto 0;
-  padding-left: 30px;
+  padding-left: 32px;
 }
 
 .timeline-list::before {
@@ -1103,7 +1103,7 @@ body {
 
 .timeline-item {
   position: relative;
-  margin-bottom: 22px;
+  margin-bottom: 18px;
   text-align: left;
 }
 
@@ -1113,7 +1113,7 @@ body {
 
 .timeline-dot {
   position: absolute;
-  left: -26px;
+  left: -28px;
   top: 4px;
   width: 14px;
   height: 14px;
@@ -1123,19 +1123,26 @@ body {
   box-shadow: 0 0 0 3px var(--color-olive-wash);
 }
 
+.timeline-dot::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: var(--color-gold-deep);
+  border-radius: 50%;
+  margin: 2px auto;
+}
+
 .timeline-time {
-  font-family: var(--font-display);
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--color-gold-deep);
-  letter-spacing: 1px;
+  display: none;
 }
 
 .timeline-title {
   font-family: var(--font-serif);
-  font-size: 1.15rem;
+  font-size: 1.12rem;
   font-weight: 600;
   color: var(--color-olive-dark);
+  line-height: 1.35;
 }
 
 .timeline-desc {
@@ -1145,13 +1152,13 @@ body {
 }
 
 /* ==========================================================================
-   CÓDIGO DE VESTIMENTA (DRESS CODE)
+   CÓDIGO DE VESTIMENTA (DRESS CODE CON COLORES RESERVADOS EN GRANDE)
    ========================================================================== */
 .dress-code-box {
-  background: rgba(255, 255, 255, 0.88);
-  border: 1px solid rgba(197, 160, 89, 0.4);
+  background: rgba(255, 255, 255, 0.92);
+  border: 1.5px solid rgba(197, 160, 89, 0.45);
   border-radius: 14px;
-  padding: 24px 20px;
+  padding: 26px 20px;
   text-align: center;
   margin-bottom: 34px;
   box-shadow: 0 8px 24px rgba(45, 55, 35, 0.06);
@@ -1161,59 +1168,115 @@ body {
 
 .dress-code-title {
   font-family: var(--font-serif);
-  font-size: 1.45rem;
+  font-size: 1.55rem;
   font-weight: 600;
   color: var(--color-olive-dark);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 
 .dress-code-rule {
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
-  line-height: 1.4;
+  line-height: 1.5;
   margin-bottom: 16px;
 }
 
-.palette-swatches {
+/* Contenedor Destacado en Grande para los Colores Reservados */
+.reserved-colors-banner {
+  background: linear-gradient(145deg, #fffcf7 0%, #fbf5e9 100%);
+  border: 2px solid var(--color-gold-primary);
+  border-radius: 14px;
+  padding: 20px 16px;
+  margin: 18px auto;
+  max-width: 440px;
+  box-shadow: 0 6px 18px rgba(143, 110, 43, 0.12);
+}
+
+.reserved-banner-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: #a44f3b;
+  letter-spacing: 2px;
+  margin-bottom: 6px;
+}
+
+.reserved-banner-title svg {
+  color: #a44f3b;
+}
+
+.reserved-banner-sub {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #6f5127;
+  margin-bottom: 16px;
+}
+
+.palette-swatches.reserved-swatches {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
 }
 
-.swatch-item {
+.swatch-item.swatch-reserved {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  min-width: 68px;
 }
 
-.swatch-circle {
-  width: 32px;
-  height: 32px;
+.swatch-reserved .swatch-circle {
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 2px solid #fff;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+  border: 3px solid #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s ease;
 }
 
-.swatch-name {
+.swatch-reserved:hover .swatch-circle {
+  transform: scale(1.1);
+}
+
+.swatch-reserved .swatch-name {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--color-olive-dark);
+  letter-spacing: 0.5px;
+}
+
+.swatch-reserved .swatch-tag {
+  font-family: var(--font-sans);
   font-size: 0.62rem;
-  font-weight: 600;
-  color: var(--color-text-muted);
+  font-weight: 700;
   text-transform: uppercase;
+  color: #fff;
+  background: #a44f3b;
+  padding: 2px 7px;
+  border-radius: 10px;
+  letter-spacing: 0.4px;
 }
 
 .dress-code-caution {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 0.82rem;
-  color: var(--color-gold-deep);
-  background: var(--color-gold-shimmer);
-  border: 1px solid rgba(197, 160, 89, 0.3);
-  padding: 6px 12px;
-  border-radius: 6px;
+  font-size: 0.88rem;
+  color: var(--color-olive-dark);
+  background: var(--color-olive-wash);
+  border: 1px solid var(--color-olive-subtle);
+  padding: 8px 16px;
+  border-radius: 8px;
   display: inline-block;
+  margin-top: 10px;
 }
 
 /* ==========================================================================

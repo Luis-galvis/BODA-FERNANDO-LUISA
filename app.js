@@ -14,7 +14,7 @@ const AppState = {
     groom: 'Edgar Fernando',
     bride: 'Luisa Fernanda',
     monogram: 'F & L',
-    weddingDate: '2026-11-14T15:30',
+    weddingDate: '2026-11-14T17:30',
     couplePhone: '573204545796',
     ceremonyPlace: 'Parroquia Nuestra Señora Del Carmen',
     ceremonyAddress: 'Cra. 5 #18-55, Ibagué, Tolima',
@@ -23,10 +23,7 @@ const AppState = {
     receptionPlace: 'Centro Vacacional Picaleña de la Policía',
     receptionAddress: 'Av. Picaleña, Ibagué, Tolima',
     receptionMaps: 'https://www.google.com/maps/search/?api=1&query=Centro+Vacacional+Picaleña+de+la+Policía+Ibague+Tolima',
-    receptionWaze: 'https://waze.com/ul?q=Centro+Vacacional+Picaleña+Ibague',
-    bankBancolombia: '285-000192-44',
-    bankNequi: '320 454 5796',
-    bankDaviplata: '320 454 5796'
+    receptionWaze: 'https://waze.com/ul?q=Centro+Vacacional+Picaleña+Ibague'
   },
   activePassFilter: 'all'
 };
@@ -112,7 +109,7 @@ function applySettingsToUI() {
 }
 
 // ==========================================================================
-// RESOLUCIÓN DEL INVITADO ACTIVO (DESDE PARÁMETROS URL O POR DEFECTO)
+// RESOLUCIÓN DEL INVITADO ACTIVO (DESDE PARÁMETROS URL O MODO GENERAL)
 // ==========================================================================
 function resolveActiveGuest() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -149,26 +146,81 @@ function resolveActiveGuest() {
     };
   }
 
-  // 4. Si no coincide ninguno, se toma el primer invitado oficial (German y Mary)
+  // 4. Si no coincide ninguno, se activa el MODO GENERAL (sin forzar a German y Mary)
   if (!resolvedGuest) {
-    resolvedGuest = GUESTS[0];
+    AppState.currentGuest = null;
+    applyGeneralInvitationToUI();
+    return;
   }
 
   AppState.currentGuest = resolvedGuest;
   applyGuestToUI(resolvedGuest);
 }
 
-// Actualizar la interfaz con los datos del invitado
-function applyGuestToUI(guest) {
+// Aplicar vista en Modo General (sin invitado específico)
+function applyGeneralInvitationToUI() {
+  document.title = "Boda Edgar Fernando & Luisa Fernanda 🌿";
+
   // 1. Rótulo del Sobre
+  const envIntro = document.getElementById('envGuestIntro');
   const envName = document.getElementById('envGuestName');
   const envPasses = document.getElementById('envGuestPasses');
+  if (envIntro) envIntro.textContent = "Estás Cordialmente Invitado/a";
+  if (envName) envName.textContent = "Boda Edgar Fernando & Luisa Fernanda";
+  if (envPasses) envPasses.textContent = "Sábado, 14 de Noviembre de 2026 • Ibagué, Tolima";
+
+  // 2. Sección Principal de la Tarjeta
+  const cardPrefix = document.getElementById('cardGuestPrefix');
+  const cardName = document.getElementById('cardGuestName');
+  const cardReserva = document.getElementById('cardGuestReserva');
+  if (cardPrefix) cardPrefix.textContent = "Con la bendición de Dios y nuestras familias";
+  if (cardName) cardName.textContent = "¡Nos Casamos!";
+  if (cardReserva) cardReserva.textContent = "Tenemos el honor de invitarte a celebrar la unión de nuestras vidas y nuestro amor";
+
+  // 3. Pases de Invitación
+  const ticketsWrapper = document.getElementById('ticketsWrapper');
+  if (ticketsWrapper) {
+    ticketsWrapper.innerHTML = `
+      <div class="ticket-pass">
+        <div class="ticket-badge-icon">🌿</div>
+        <div class="ticket-pass-info">
+          <div class="ticket-pass-title">Boleto de Honor</div>
+          <div class="ticket-pass-desc">Pase de Invitación Válido</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // 4. Formulario RSVP limpio
+  const rsvpName = document.getElementById('rsvpInputName');
+  if (rsvpName) rsvpName.value = '';
+
+  // 5. Botón Directo WhatsApp General
+  const btnRSVP = document.getElementById('btnWhatsAppRSVP');
+  if (btnRSVP) {
+    const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573204545796';
+    const groom = AppState.weddingSettings.groom;
+    const bride = AppState.weddingSettings.bride;
+    const message = `¡Hola ${groom} y ${bride}! 🌿🤍 Confirmo con mucha alegría mi asistencia a su matrimonio. ¡Nos vemos allá para celebrar juntos! ✨🕊️`;
+    btnRSVP.href = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+  }
+}
+
+// Actualizar la interfaz con los datos del invitado personalizado
+function applyGuestToUI(guest) {
+  // 1. Rótulo del Sobre
+  const envIntro = document.getElementById('envGuestIntro');
+  const envName = document.getElementById('envGuestName');
+  const envPasses = document.getElementById('envGuestPasses');
+  if (envIntro) envIntro.textContent = "Estás Cordialmente Invitado/a";
   if (envName) envName.textContent = guest.name;
   if (envPasses) envPasses.textContent = guest.reservaText;
 
   // 2. Sección Principal de la Tarjeta
+  const cardPrefix = document.getElementById('cardGuestPrefix');
   const cardName = document.getElementById('cardGuestName');
   const cardReserva = document.getElementById('cardGuestReserva');
+  if (cardPrefix) cardPrefix.textContent = "Nos complace invitar a:";
   if (cardName) cardName.textContent = guest.name;
   if (cardReserva) cardReserva.textContent = guest.reservaText;
 
@@ -194,12 +246,7 @@ function applyGuestToUI(guest) {
 
   // 4. Formulario RSVP - Prellenar valores
   const rsvpName = document.getElementById('rsvpInputName');
-  const rsvpGuestsCount = document.getElementById('rsvpInputGuestsCount');
   if (rsvpName) rsvpName.value = guest.name;
-  if (rsvpGuestsCount) {
-    rsvpGuestsCount.value = guest.passes || 2;
-    rsvpGuestsCount.max = Math.max(guest.passes || 2, 5);
-  }
 
   // 5. Botón Directo de WhatsApp RSVP
   updateWhatsAppRSVPLink(guest);
@@ -321,7 +368,7 @@ function openEnvelope() {
 
   // Sonido de apertura y música
   playWaxCrackSound();
-  startRomanticHarpMusic();
+  playWeddingMusic();
 
   // Animación del sello de cera
   if (waxImg) {
@@ -370,20 +417,15 @@ window.resetToEnvelope = function() {
 };
 
 // ==========================================================================
-// AUDIO AMBIENTAL CON WEB AUDIO API (ARPA Y CAMPANAS ROMÁNTICAS)
+// REPRODUCCIÓN DE MÚSICA OFICIAL (FONSECA, JUANES - ANTES QUE EL TIEMPO SE VAYA)
 // ==========================================================================
 let audioCtx = null;
-let harpGain = null;
-let harpIntervalId = null;
 
 function initAudioContext() {
   if (!audioCtx) {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     if (AudioContextClass) {
       audioCtx = new AudioContextClass();
-      harpGain = audioCtx.createGain();
-      harpGain.gain.setValueAtTime(0.001, audioCtx.currentTime);
-      harpGain.connect(audioCtx.destination);
     }
   }
   if (audioCtx && audioCtx.state === 'suspended') {
@@ -391,114 +433,43 @@ function initAudioContext() {
   }
 }
 
-// Toca una nota simulando cuerda de arpa clásica
-function playHarpPluck(frequency, delay = 0, duration = 2.4) {
-  if (!audioCtx || !AppState.isMusicPlaying) return;
-
-  const startTime = audioCtx.currentTime + delay;
-  
-  // Oscilador principal
-  const osc = audioCtx.createOscillator();
-  osc.type = 'triangle';
-  osc.frequency.setValueAtTime(frequency, startTime);
-
-  // Armónico celestial más brillante
-  const harmonic = audioCtx.createOscillator();
-  harmonic.type = 'sine';
-  harmonic.frequency.setValueAtTime(frequency * 2, startTime);
-
-  // Filtro pasa-bajos cálido tipo madera
-  const filter = audioCtx.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.setValueAtTime(1400, startTime);
-  filter.frequency.exponentialRampToValueAtTime(350, startTime + duration);
-
-  // Envolvente de volumen acústico (ataque percusivo suave, caída larga)
-  const noteGain = audioCtx.createGain();
-  noteGain.gain.setValueAtTime(0.0001, startTime);
-  noteGain.gain.linearRampToValueAtTime(0.18, startTime + 0.02);
-  noteGain.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-
-  const harmGain = audioCtx.createGain();
-  harmGain.gain.setValueAtTime(0.0001, startTime);
-  harmGain.gain.linearRampToValueAtTime(0.06, startTime + 0.015);
-  harmGain.gain.exponentialRampToValueAtTime(0.0001, startTime + (duration * 0.7));
-
-  osc.connect(filter);
-  harmonic.connect(harmGain);
-  harmGain.connect(filter);
-  filter.connect(noteGain);
-  noteGain.connect(harpGain);
-
-  osc.start(startTime);
-  harmonic.start(startTime);
-  osc.stop(startTime + duration);
-  harmonic.stop(startTime + duration);
+function getWeddingAudio() {
+  return document.getElementById('weddingBgAudio');
 }
 
-// Progresión romántica de arpa (Re Mayor: Dmaj7 -> Gmaj7 -> Bm7 -> A7sus4)
-function startRomanticHarpMusic() {
-  initAudioContext();
-  if (!audioCtx) return;
+function playWeddingMusic() {
+  const audio = getWeddingAudio();
+  if (!audio) return;
 
-  AppState.isMusicPlaying = true;
-  updateMusicUI(true);
-
-  // Subir volumen maestro gradualmente
-  if (harpGain) {
-    harpGain.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 1.5);
-  }
-
-  // Frecuencias en Hz (D4, F#4, A4, C#5, E5, etc.)
-  const chordDmaj7 = [293.66, 369.99, 440.00, 554.37, 587.33];
-  const chordGmaj7 = [196.00, 293.66, 369.99, 440.00, 493.88];
-  const chordBm7   = [246.94, 293.66, 369.99, 440.00, 493.88];
-  const chordA7sus = [220.00, 293.66, 329.63, 440.00, 554.37];
-
-  const chords = [chordDmaj7, chordGmaj7, chordBm7, chordA7sus];
-  let chordIndex = 0;
-
-  function playArpeggioCycle() {
-    if (!AppState.isMusicPlaying) return;
-    const currentChord = chords[chordIndex % chords.length];
-    
-    // Tocar notas arpegiadas
-    currentChord.forEach((freq, idx) => {
-      playHarpPluck(freq, idx * 0.38, 2.5);
+  audio.volume = 0.8;
+  const playPromise = audio.play();
+  if (playPromise !== undefined) {
+    playPromise.then(() => {
+      AppState.isMusicPlaying = true;
+      updateMusicUI(true);
+    }).catch(err => {
+      console.warn('El navegador requiere un clic del usuario para reproducir audio:', err);
+      AppState.isMusicPlaying = false;
+      updateMusicUI(false);
     });
-
-    // Campana celestial sutil en la tónica alta
-    setTimeout(() => {
-      if (AppState.isMusicPlaying) {
-        playHarpPluck(currentChord[currentChord.length - 1] * 1.5, 0, 1.8);
-      }
-    }, 1800);
-
-    chordIndex++;
   }
-
-  playArpeggioCycle();
-  if (harpIntervalId) clearInterval(harpIntervalId);
-  harpIntervalId = setInterval(playArpeggioCycle, 3400);
 }
 
-function stopRomanticHarpMusic() {
+function stopWeddingMusic() {
+  const audio = getWeddingAudio();
+  if (!audio) return;
+  audio.pause();
   AppState.isMusicPlaying = false;
   updateMusicUI(false);
-  if (harpGain && audioCtx) {
-    harpGain.gain.linearRampToValueAtTime(0.0001, audioCtx.currentTime + 0.6);
-  }
-  if (harpIntervalId) {
-    clearInterval(harpIntervalId);
-    harpIntervalId = null;
-  }
 }
 
 function toggleMusic() {
-  if (AppState.isMusicPlaying) {
-    stopRomanticHarpMusic();
+  const audio = getWeddingAudio();
+  if (!audio) return;
+  if (audio.paused) {
+    playWeddingMusic();
   } else {
-    startRomanticHarpMusic();
+    stopWeddingMusic();
   }
 }
 
@@ -507,10 +478,10 @@ function updateMusicUI(isPlaying) {
   if (!btn) return;
   if (isPlaying) {
     btn.classList.remove('muted');
-    btn.title = 'Pausar música ambiental';
+    btn.title = 'Pausar música: Fonseca, Juanes - Antes que el tiempo se vaya';
   } else {
     btn.classList.add('muted');
-    btn.title = 'Reproducir música ambiental';
+    btn.title = 'Reproducir música: Fonseca, Juanes - Antes que el tiempo se vaya';
   }
 }
 
@@ -696,45 +667,67 @@ function downloadCalendarEvent() {
 window.handleRSVPSubmit = function(event) {
   event.preventDefault();
 
-  const name = document.getElementById('rsvpInputName').value;
-  const attendance = document.getElementById('rsvpInputAttendance').value;
-  const guests = document.getElementById('rsvpInputGuestsCount').value;
-  const diet = document.getElementById('rsvpInputDiet').value;
-  const song = document.getElementById('rsvpInputSong').value;
-  const message = document.getElementById('rsvpInputMessage').value;
+  const nameInput = document.getElementById('rsvpInputName');
+  const attendanceInput = document.getElementById('rsvpInputAttendance');
+  const messageInput = document.getElementById('rsvpInputMessage');
+
+  const name = nameInput ? nameInput.value.trim() : '';
+  const attendance = attendanceInput ? attendanceInput.value : 'si';
+  const message = messageInput ? messageInput.value.trim() : '';
+
+  if (!name) {
+    alert('Por favor escribe tu nombre completo para confirmar.');
+    return;
+  }
 
   const phone = AppState.weddingSettings.couplePhone.replace(/\D/g, '') || '573204545796';
   const groom = AppState.weddingSettings.groom;
   const bride = AppState.weddingSettings.bride;
 
-  const statusText = attendance === 'si' ? '¡Sí asistiré con alegría! 🌿' : 'Lamentablemente no podré asistir 🤍';
+  const statusText = attendance === 'si' ? '¡Sí, asistiré con mucha alegría! 🌿' : 'Lamentablemente no podré asistir 🤍';
 
   const rsvpText = [
-    `¡Hola ${groom} y ${bride}!`,
+    `¡Hola ${groom} y ${bride}! 🌿🤍`,
     `*Confirmación de Asistencia a la Boda:*`,
-    `• *Nombre:* ${name}`,
+    `• *Invitado:* ${name}`,
     `• *Respuesta:* ${statusText}`,
-    `• *Personas confirmadas:* ${guests}`,
-    `• *Preferencia menú:* ${diet}`,
-    song ? `• *Canción sugerida:* 🎵 ${song}` : '',
     message ? `• *Mensaje:* "${message}"` : ''
   ].filter(Boolean).join('\n');
 
-  // Guardar en localStorage
+  const payload = {
+    name,
+    attendance,
+    statusText,
+    message,
+    date: new Date().toISOString()
+  };
+
+  // 1. Enviar a la nube (ntfy.sh) para sincronización en tiempo real con el Panel de Novios
+  fetch('https://ntfy.sh/boda-edgar-fernando-luisa-fernanda-rsvp-2026', {
+    method: 'POST',
+    headers: {
+      'Title': `Confirmación Boda: ${name}`,
+      'Priority': 'high',
+      'Tags': attendance === 'si' ? 'white_check_mark,ring' : 'x,white_heart'
+    },
+    body: JSON.stringify(payload)
+  }).catch(err => console.warn('Sync cloud error:', err));
+
+  // 2. Guardar en almacenamiento local del dispositivo como respaldo
   try {
     const list = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
-    list.push({ name, attendance, guests, diet, song, message, date: new Date().toISOString() });
+    list.push(payload);
     localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(list));
   } catch (e) {
     console.error(e);
   }
 
-  showToast('✓ ¡Confirmación registrada!');
+  showToast('✓ ¡Confirmación registrada con éxito!');
 
-  // Abrir WhatsApp con el resumen completo
+  // 3. Abrir WhatsApp para entrega directa a los novios
   setTimeout(() => {
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(rsvpText)}`, '_blank');
-  }, 600);
+  }, 500);
 };
 
 // ==========================================================================
