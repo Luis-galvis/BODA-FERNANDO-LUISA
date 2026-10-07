@@ -1,5 +1,5 @@
 // Lista oficial de invitados para la boda
-// Extraccion automatica y normalizada desde lista_invitados_boda.xlsx
+// Extraccion definitiva y validada segun lista oficial de novios (49 invitados, 85 pases)
 export const GUESTS = [
   {
     "id": 1,
@@ -275,22 +275,6 @@ export const GUESTS = [
   },
   {
     "id": 35,
-    "slug": "luisa-y-fercho",
-    "name": "Luisa y Fercho",
-    "passes": 2,
-    "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3172959658"
-  },
-  {
-    "id": 36,
-    "slug": "fercho-y-luisa",
-    "name": "Fercho y Luisa",
-    "passes": 2,
-    "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3178411896"
-  },
-  {
-    "id": 37,
     "slug": "oscar-y-blanca",
     "name": "Oscar y Blanca",
     "passes": 2,
@@ -298,7 +282,7 @@ export const GUESTS = [
     "phone": "3178492983"
   },
   {
-    "id": 38,
+    "id": 36,
     "slug": "maria-jose",
     "name": "Maria Jose",
     "passes": 1,
@@ -306,7 +290,7 @@ export const GUESTS = [
     "phone": "3187026437"
   },
   {
-    "id": 39,
+    "id": 37,
     "slug": "luis-y-julieth",
     "name": "Luis y Julieth",
     "passes": 2,
@@ -314,7 +298,7 @@ export const GUESTS = [
     "phone": "3204545796"
   },
   {
-    "id": 40,
+    "id": 38,
     "slug": "fernando-y-alejandra",
     "name": "Fernando y Alejandra",
     "passes": 2,
@@ -322,7 +306,7 @@ export const GUESTS = [
     "phone": "3205582770"
   },
   {
-    "id": 41,
+    "id": 39,
     "slug": "yesid-y-martha",
     "name": "Yesid y Martha",
     "passes": 2,
@@ -330,7 +314,7 @@ export const GUESTS = [
     "phone": "3205633432"
   },
   {
-    "id": 42,
+    "id": 40,
     "slug": "santiago-y-valen",
     "name": "Santiago y Valen",
     "passes": 2,
@@ -338,7 +322,7 @@ export const GUESTS = [
     "phone": "3212082769"
   },
   {
-    "id": 43,
+    "id": 41,
     "slug": "camilo-y-lina",
     "name": "Camilo y Lina",
     "passes": 2,
@@ -346,7 +330,7 @@ export const GUESTS = [
     "phone": "3212318833"
   },
   {
-    "id": 44,
+    "id": 42,
     "slug": "familia-galindo-moreno",
     "name": "Familia Galindo Moreno",
     "passes": 3,
@@ -354,7 +338,7 @@ export const GUESTS = [
     "phone": "3213221773"
   },
   {
-    "id": 45,
+    "id": 43,
     "slug": "familia-moreno-gonzalez",
     "name": "Familia Moreno Gonzalez",
     "passes": 4,
@@ -362,7 +346,7 @@ export const GUESTS = [
     "phone": "3222307829"
   },
   {
-    "id": 46,
+    "id": 44,
     "slug": "victor-y-xilenia",
     "name": "Victor y Xilenia",
     "passes": 2,
@@ -370,15 +354,15 @@ export const GUESTS = [
     "phone": "3228452238"
   },
   {
-    "id": 47,
-    "slug": "alexis-rubiano",
-    "name": "Alexis Rubiano",
+    "id": 45,
+    "slug": "alexis-rubiano-y-sra",
+    "name": "Alexis Rubiano & Sra",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
     "phone": "3148942652"
   },
   {
-    "id": 48,
+    "id": 46,
     "slug": "javier-y-sra",
     "name": "Javier & Sra",
     "passes": 2,
@@ -386,7 +370,7 @@ export const GUESTS = [
     "phone": "3045963615"
   },
   {
-    "id": 49,
+    "id": 47,
     "slug": "yeison",
     "name": "Yeison",
     "passes": 1,
@@ -394,7 +378,7 @@ export const GUESTS = [
     "phone": "3154383970"
   },
   {
-    "id": 50,
+    "id": 48,
     "slug": "daniela",
     "name": "Daniela",
     "passes": 1,
@@ -402,20 +386,12 @@ export const GUESTS = [
     "phone": "3175844709"
   },
   {
-    "id": 51,
+    "id": 49,
     "slug": "juan-pablo",
     "name": "Juan Pablo",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
     "phone": "3178688336"
-  },
-  {
-    "id": 52,
-    "slug": "prueba-luisa",
-    "name": "Prueba Luisa",
-    "passes": 2,
-    "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3172959658"
   }
 ];
 

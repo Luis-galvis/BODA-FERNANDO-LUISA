@@ -11,3 +11,5 @@ auth/
 scratch/
 bot_envio/enviados.json
 bot_envio/pdfs/
+__pycache__/
+*.pyc
