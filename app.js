@@ -867,10 +867,8 @@ function renderHostGuestList() {
 
     const groom = AppState.weddingSettings.groom;
     const bride = AppState.weddingSettings.bride;
-    const s_plural = guest.passes > 1 ? 's' : '';
-    
-    // Mensaje personalizado de invitación para enviar al WhatsApp del invitado
-    const waInviteMessage = `💌 *INVITACIÓN OFICIAL DE BODA* 💍\n\n¡Hola ${guest.name}! Con inmensa alegría queremos invitarte a celebrar nuestro matrimonio. Esta invitación está reservada para *${guest.passes} persona${s_plural}*.\n\nPuedes conocer todos los detalles de la ceremonia, recepción y confirmar tu asistencia en tu tarjeta interactiva aquí:\n${cardLink}\n\n⚠️ *Por favor confirmar antes del 13 de Octubre para asegurar tu reserva.*\n\n¡Esperamos contar con tu compañía en este día tan especial! 🤍\n— *Fernando & Luisa Fernanda*`;
+    const passesText = guest.passes > 1 ? `(tu invitación está reservada para *${guest.passes} personas*)` : `(tu invitación está reservada para *1 persona*)`;
+    const waInviteMessage = `¡Hola *${guest.name}*! ✨\n\nEstamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial. 🤍\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${cardLink}\n\nCon todo nuestro cariño,\n— *Fernando & Luisa Fernanda*`;
 
     const waHref = intlPhone 
       ? `https://wa.me/${intlPhone}?text=${encodeURIComponent(waInviteMessage)}`
