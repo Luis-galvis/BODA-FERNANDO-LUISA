@@ -1110,7 +1110,69 @@ body {
   font-size: 0.8rem;
   color: var(--color-text-muted);
   line-height: 1.4;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+}
+
+/* En memoria (bajo la ceremonia) */
+.memorial-box {
+  margin: 4px auto 18px;
+  text-align: center;
+}
+
+.memorial-heart {
+  color: var(--color-gold-deep);
+  font-size: 0.8rem;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.memorial-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-gold-deep);
+}
+
+.memorial-label::before,
+.memorial-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--color-gold-primary));
+}
+
+.memorial-label::after {
+  transform: scaleX(-1);
+}
+
+.memorial-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--color-olive-dark);
+  margin: 6px 0 4px;
+}
+
+.memorial-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+  max-width: 88%;
+  margin: 0 auto 6px;
+}
+
+.memorial-leaf {
+  width: 34px;
+  height: 34px;
+  color: var(--color-olive-medium);
 }
 
 .location-buttons {
