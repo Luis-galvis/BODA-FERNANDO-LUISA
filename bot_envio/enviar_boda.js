@@ -682,7 +682,7 @@ function renderHtml() {
     }
 
     async function sendTestTrio() {
-      if (!confirm('¿Deseas enviar la invitación de prueba a los 3 seleccionados:\n1. Luis y Julieth (3204545796)\n2. Familia Galindo Moreno (3213221773)\n3. Prueba Luisa (3172959658)?')) return;
+      if (!confirm('¿Deseas enviar la invitación de prueba a los 3 seleccionados: Luis y Julieth, Familia Galindo Moreno y Prueba Luisa?')) return;
       
       const btn = document.getElementById('btnSendTrio');
       btn.disabled = true;
