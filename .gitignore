@@ -10,3 +10,4 @@ auth/
 *.log
 scratch/
 bot_envio/enviados.json
+bot_envio/pdfs/

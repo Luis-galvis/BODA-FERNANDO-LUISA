@@ -12,7 +12,7 @@ import http from 'http';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { exec } from 'child_process';
+import { exec, execSync } from 'child_process';
 
 // Cargar lista oficial de invitados
 import { GUESTS } from '../data/guests.js';
@@ -23,6 +23,7 @@ const __dirname = path.dirname(__filename);
 const PORT = 3005;
 const SESSION_DIR = path.join(__dirname, 'auth_baileys');
 const ENVIADOS_FILE = path.join(__dirname, 'enviados.json');
+const PDF_DIR = path.join(__dirname, 'pdfs');
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -70,21 +71,16 @@ function saveEnviado(id, name, phone) {
   }
 }
 
-function buildMessage(guestName, passes = 1, slug = '') {
+// Mensaje de saludo cordial SIN LINK en el texto (el link y los detalles van en el PDF)
+function buildMessage(guestName, passes = 1) {
   const numPasses = parseInt(passes, 10) || 1;
   const passesText = numPasses > 1 
     ? `(tu invitación está reservada para *${numPasses} personas*)` 
     : `(tu invitación está reservada para *1 persona*)`;
-  
-  const cardLink = slug 
-    ? `https://boda-fernando-luisa.vercel.app/index.html?invitado=${slug}`
-    : `https://boda-fernando-luisa.vercel.app/`;
 
   return `¡Hola *${guestName}*!\n\n` +
-    `Estamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n` +
-    `¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial.\n\n` +
-    `Puedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n` +
-    `${cardLink}\n\n` +
+    `Estamos muy emocionados de compartir este día tan especial contigo. Te compartimos adjunta la Invitación Oficial para nuestro matrimonio ${passesText}.\n\n` +
+    `Al abrir el documento PDF adjunto podrás conocer todos los detalles y pulsar directamente en el botón para abrir tu tarjeta interactiva y confirmar tu asistencia.\n\n` +
     `Con todo nuestro cariño,\n` +
     `— *Fernando & Luisa Fernanda*`;
 }
@@ -169,11 +165,11 @@ async function initBaileys() {
 
       // Si se inició con parámetro --test, disparar automáticamente la prueba a los 3 invitados
       if (process.argv.includes('--test')) {
-        addLog('🧪 MODO PRUEBA CLI DETECTADO: Disparando prueba a los 3 invitados en 4 segundos...');
+        addLog('🧪 MODO PRUEBA CLI DETECTADO: Disparando prueba en PDF a los 3 invitados en 4 segundos...');
         setTimeout(async () => {
           await runTrioSender();
           console.log('\n=============================================================');
-          console.log('✅ PRUEBA DE LOS 3 INVITADOS COMPLETADA.');
+          console.log('✅ PRUEBA EN PDF DE LOS 3 INVITADOS COMPLETADA.');
           console.log('=============================================================\n');
         }, 4000);
       }
@@ -181,8 +177,8 @@ async function initBaileys() {
   });
 }
 
-// Función de envío individual (con imagen de gala adjunta)
-async function sendMessageToJid(jid, text) {
+// Función de envío de invitación como documento PDF oficial
+async function sendMessageToJid(jid, guest, text) {
   if (!BotState.sock || BotState.status !== 'connected') {
     throw new Error('WhatsApp no está conectado todavía. Por favor escanea el código QR.');
   }
@@ -194,15 +190,29 @@ async function sendMessageToJid(jid, text) {
     await BotState.sock.sendPresenceUpdate('paused', jid);
   } catch (_) {}
 
-  // 2. Enviar con la tarjeta de boda de gala como imagen adjunta
-  const imagePath = path.join(__dirname, '../assets/tarjeta_invitacion_whatsapp.jpg');
-  if (fs.existsSync(imagePath)) {
-    const imageBuffer = fs.readFileSync(imagePath);
+  // 2. Buscar archivo PDF personalizado del invitado
+  const slug = guest?.slug || 'prueba';
+  let pdfPath = path.join(PDF_DIR, `Invitacion_Boda_${slug}.pdf`);
+
+  // Si no existe, generarlo
+  if (!fs.existsSync(pdfPath)) {
+    try {
+      execSync(`python "${path.join(__dirname, 'generar_pdfs.py')}"`, { stdio: 'ignore' });
+    } catch (_) {}
+  }
+
+  if (fs.existsSync(pdfPath)) {
+    const pdfBuffer = fs.readFileSync(pdfPath);
+    const cleanFileName = `Invitación Oficial de Boda • ${guest.name}.pdf`;
+
     await BotState.sock.sendMessage(jid, { 
-      image: imageBuffer, 
+      document: pdfBuffer, 
+      mimetype: 'application/pdf',
+      fileName: cleanFileName,
       caption: text 
     });
   } else {
+    // Si no está disponible el PDF, enviar texto
     await BotState.sock.sendMessage(jid, { text });
   }
 }
@@ -215,7 +225,7 @@ async function runTrioSender() {
     GUESTS.find(g => g.id === 53)  // Prueba Luisa (3172959658)
   ].filter(Boolean);
 
-  addLog(`🧪 INICIANDO PRUEBA DE 3 INVITADOS:`);
+  addLog(`🧪 INICIANDO PRUEBA DE 3 INVITADOS EN PDF:`);
   addLog(`1. Luis y Julieth (3204545796)`);
   addLog(`2. Familia Galindo Moreno (3213221773)`);
   addLog(`3. Prueba Luisa (3172959658)`);
@@ -225,12 +235,12 @@ async function runTrioSender() {
     const jid = formatJid(guest.phone);
     if (!jid) continue;
 
-    addLog(`💌 [${i + 1}/${trio.length}] Enviando prueba a *${guest.name}* (+${jid.replace('@s.whatsapp.net', '')})...`);
-    const message = buildMessage(guest.name, guest.passes, guest.slug);
+    addLog(`📄 [${i + 1}/${trio.length}] Enviando PDF oficial a *${guest.name}* (+${jid.replace('@s.whatsapp.net', '')})...`);
+    const message = buildMessage(guest.name, guest.passes);
 
     try {
-      await sendMessageToJid(jid, message);
-      addLog(`✅ [${i + 1}/${trio.length}] ¡Prueba enviada con éxito a ${guest.name}!`);
+      await sendMessageToJid(jid, guest, message);
+      addLog(`✅ [${i + 1}/${trio.length}] ¡PDF enviado con éxito a ${guest.name}!`);
 
       if (i < trio.length - 1) {
         const delay = 6;
@@ -255,7 +265,7 @@ async function runBulkSender() {
   const enviados = getEnviados();
   const pending = GUESTS.filter(g => g.phone && g.phone.trim().length > 0 && !enviados.includes(g.id));
 
-  addLog(`🚀 INICIANDO DIFUSIÓN: ${pending.length} invitados pendientes por enviar.`);
+  addLog(`🚀 INICIANDO DIFUSIÓN DE PDFs: ${pending.length} invitados pendientes por enviar.`);
 
   let count = 0;
 
@@ -273,14 +283,14 @@ async function runBulkSender() {
       continue;
     }
 
-    addLog(`💌 [${i + 1}/${pending.length}] Enviando a ${guest.name} (+${jid.replace('@s.whatsapp.net', '')})...`);
-    const message = buildMessage(guest.name, guest.passes, guest.slug);
+    addLog(`📄 [${i + 1}/${pending.length}] Enviando PDF a ${guest.name} (+${jid.replace('@s.whatsapp.net', '')})...`);
+    const message = buildMessage(guest.name, guest.passes);
 
     try {
-      await sendMessageToJid(jid, message);
+      await sendMessageToJid(jid, guest, message);
       saveEnviado(guest.id, guest.name, guest.phone);
       count++;
-      addLog(`✅ [${i + 1}/${pending.length}] ¡Enviado con éxito a ${guest.name}!`);
+      addLog(`✅ [${i + 1}/${pending.length}] ¡PDF entregado con éxito a ${guest.name}!`);
 
       if (i < pending.length - 1 && !BotState.shouldStop) {
         const delay = Math.floor(8 + Math.random() * 5); // 8 a 13 segundos
@@ -294,7 +304,7 @@ async function runBulkSender() {
   }
 
   BotState.isSendingAll = false;
-  addLog(`🎉 Proceso masivo terminado. Se enviaron ${count} invitaciones en esta tanda.`);
+  addLog(`🎉 Proceso masivo terminado. Se enviaron ${count} invitaciones en PDF en esta tanda.`);
 }
 
 // Servidor Web para Interfaz Gráfica
@@ -325,7 +335,7 @@ const server = http.createServer(async (req, res) => {
     const list = GUESTS.map(g => ({
       ...g,
       sent: enviados.includes(g.id),
-      sampleMessage: buildMessage(g.name, g.passes, g.slug)
+      sampleMessage: buildMessage(g.name, g.passes)
     }));
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify(list));
@@ -352,7 +362,7 @@ const server = http.createServer(async (req, res) => {
         const targetPhone = data.phone || BotState.myPhone;
         const guestName = data.name || 'Invitado de Prueba';
         const passes = data.passes || 2;
-        const slug = data.slug || 'prueba';
+        const slug = data.slug || 'prueba-luisa';
 
         const jid = formatJid(targetPhone);
         if (!jid) {
@@ -360,13 +370,15 @@ const server = http.createServer(async (req, res) => {
           return res.end(JSON.stringify({ error: 'Número de teléfono inválido' }));
         }
 
-        const msg = buildMessage(guestName, passes, slug);
-        addLog(`🧪 Enviando prueba a ${guestName} (+${jid.replace('@s.whatsapp.net', '')})...`);
-        await sendMessageToJid(jid, msg);
-        addLog(`✅ ¡Prueba enviada con éxito a +${jid.replace('@s.whatsapp.net', '')}!`);
+        const msg = buildMessage(guestName, passes);
+        const testGuest = { name: guestName, passes: passes, slug: slug };
+
+        addLog(`🧪 Enviando prueba en PDF a ${guestName} (+${jid.replace('@s.whatsapp.net', '')})...`);
+        await sendMessageToJid(jid, testGuest, msg);
+        addLog(`✅ ¡Prueba en PDF enviada con éxito a +${jid.replace('@s.whatsapp.net', '')}!`);
 
         res.writeHead(200, { 'Content-Type': 'application/json' });
-        return res.end(JSON.stringify({ success: true, message: 'Mensaje de prueba enviado exitosamente' }));
+        return res.end(JSON.stringify({ success: true, message: 'Invitación en PDF enviada exitosamente' }));
       } catch (err) {
         addLog(`❌ Error en envío de prueba: ${err.message}`);
         res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -404,12 +416,15 @@ const server = http.createServer(async (req, res) => {
     return res.end(JSON.stringify({ success: true }));
   }
 
-  // Endpoint: Servir imagen de gala de la tarjeta
-  if (url.pathname === '/preview-card.jpg') {
-    const imgPath = path.join(__dirname, '../assets/tarjeta_invitacion_whatsapp.jpg');
-    if (fs.existsSync(imgPath)) {
-      res.writeHead(200, { 'Content-Type': 'image/jpeg' });
-      return res.end(fs.readFileSync(imgPath));
+  // Endpoint: Descargar PDF de muestra
+  if (url.pathname === '/sample.pdf') {
+    const samplePath = path.join(PDF_DIR, 'Invitacion_Boda_luis-y-julieth.pdf');
+    if (fs.existsSync(samplePath)) {
+      res.writeHead(200, { 
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'inline; filename="Invitacion_Boda_Luis_y_Julieth.pdf"'
+      });
+      return res.end(fs.readFileSync(samplePath));
     }
   }
 
@@ -428,7 +443,7 @@ function renderHtml() {
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Panel de Envío de Invitaciones • Baileys</title>
+  <title>Panel de Envío de Invitaciones en PDF • Baileys</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Cormorant+Garamond:wght@600;700&display=swap" rel="stylesheet">
   <style>
@@ -465,7 +480,7 @@ function renderHtml() {
     label { display: block; font-size: 0.82rem; font-weight: 600; color: #495057; margin-bottom: 5px; }
     input, select { width: 100%; padding: 10px 12px; border: 1px solid #ced4da; border-radius: 8px; font-size: 0.9rem; }
 
-    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 18px; border-radius: 8px; border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; }
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px 18px; border-radius: 8px; border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; text-decoration: none; }
     .btn-primary { background: var(--olive-primary); color: #fff; }
     .btn-primary:hover { background: var(--olive-dark); }
     .btn-gold { background: var(--gold); color: #fff; }
@@ -483,21 +498,23 @@ function renderHtml() {
 <body>
   <div class="container">
     <header>
-      <h1>💍 Bot de Envío de Invitaciones de Boda</h1>
-      <p>Envío automático y seguro vía WhatsApp • Fernando & Luisa Fernanda</p>
+      <h1>💍 Bot de Envío de Invitaciones Oficiales en PDF</h1>
+      <p>Envío formal y seguro vía WhatsApp • Fernando & Luisa Fernanda</p>
     </header>
 
-    <!-- Banner informativo de la tarjeta de invitación que se adjunta -->
-    <div style="display: flex; align-items: center; gap: 18px; background: #faf8f0; border: 1.5px solid var(--gold); border-radius: 14px; padding: 14px 20px; margin-bottom: 22px; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-      <img src="/preview-card.jpg" style="width: 75px; height: 100px; object-fit: cover; border-radius: 8px; border: 1px solid var(--gold); box-shadow: 0 4px 10px rgba(0,0,0,0.12);" alt="Tarjeta de Boda">
+    <!-- Banner informativo del formato PDF -->
+    <div style="background: #faf8f0; border: 2px solid var(--gold); border-radius: 14px; padding: 16px 20px; margin-bottom: 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
       <div>
-        <div style="font-weight: 700; font-size: 0.95rem; color: var(--olive-dark); margin-bottom: 4px;">
-          📸 Cada invitado recibirá esta hermosa foto de la tarjeta de gala directamente en WhatsApp
+        <div style="font-weight: 700; font-size: 1rem; color: var(--olive-dark); margin-bottom: 4px;">
+          📄 Invitación Oficial como Documento PDF Adjunto (Sin links raros en el chat)
         </div>
-        <p style="font-size: 0.82rem; color: #555; line-height: 1.45;">
-          Al llegar como una <strong>foto real de boda</strong> con sus nombres y su enlace en el pie de foto, los familiares y amigos ven de inmediato que es una tarjeta auténtica de los novios, generando total confianza para abrirla y confirmar su asistencia.
+        <p style="font-size: 0.83rem; color: #555; line-height: 1.45;">
+          Los invitados reciben un archivo formal de boda en WhatsApp. Dentro del PDF tienen el diseño de gala con sus nombres y un <strong>botón interactivo real</strong> que al pulsarlo abre su tarjeta 3D en el navegador.
         </p>
       </div>
+      <a href="/sample.pdf" target="_blank" class="btn btn-gold" style="width: auto; padding: 10px 18px; font-size: 0.85rem; white-space: nowrap;">
+        👁️ Ver PDF de Muestra
+      </a>
     </div>
 
     <div class="grid">
@@ -524,19 +541,19 @@ function renderHtml() {
             Conectado desde el número: <strong id="lblPhone">+57 ...</strong>
           </p>
           <p style="font-size: 0.78rem; color: #666; margin-top: 6px;">
-            Los mensajes de la boda se enviarán directamente desde este número.
+            Los PDFs de la boda se enviarán directamente desde este número.
           </p>
         </div>
       </div>
 
       <!-- Tarjeta 2: Modo Prueba -->
       <div class="card">
-        <div class="card-title">🧪 2. Modo Prueba</div>
+        <div class="card-title">🧪 2. Modo Prueba en PDF</div>
 
         <!-- PRUEBA RÁPIDA CON LOS 3 SOLICITADOS -->
         <div style="background: #faf8f0; border: 1.5px solid var(--gold); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
           <div style="font-weight: 700; font-size: 0.9rem; color: var(--olive-dark); margin-bottom: 6px;">
-            ✨ Enviar Prueba a los 3 Invitados:
+            ✨ Enviar PDF de Prueba a los 3 Invitados:
           </div>
           <ul style="font-size: 0.78rem; color: #555; margin-left: 18px; margin-bottom: 12px; line-height: 1.45;">
             <li><strong>Luis y Julieth:</strong> 3204545796 (2 pases)</li>
@@ -544,12 +561,12 @@ function renderHtml() {
             <li><strong>Prueba Luisa:</strong> 3172959658 (2 pases)</li>
           </ul>
           <button class="btn btn-gold" onclick="sendTestTrio()" id="btnSendTrio" style="font-size: 0.88rem; padding: 11px;">
-            🚀 Enviar Prueba a estos 3 Números
+            🚀 Enviar PDF de Prueba a estos 3 Números
           </button>
         </div>
 
         <p style="font-size: 0.78rem; color: #666; margin-bottom: 8px;">
-          O prueba individual con cualquier número:
+          O prueba individual de PDF con cualquier número:
         </p>
 
         <div class="form-group">
@@ -584,14 +601,14 @@ function renderHtml() {
         </div>
 
         <button class="btn btn-primary" onclick="sendTestMessage()" id="btnSendTest" style="font-size: 0.88rem;">
-          📤 Enviar 1 Mensaje Individual de Prueba
+          📤 Enviar 1 Invitación en PDF de Prueba
         </button>
       </div>
     </div>
 
     <!-- Tarjeta 3: Envío Masivo a Todos los Invitados -->
     <div class="card">
-      <div class="card-title">🚀 3. Envío Masivo a los 53 Invitados</div>
+      <div class="card-title">🚀 3. Envío Masivo en PDF a los 53 Invitados</div>
       
       <div class="stats-row">
         <div class="stat-box">
@@ -613,12 +630,12 @@ function renderHtml() {
       </div>
 
       <p style="font-size: 0.8rem; color: #666; margin-bottom: 14px;">
-        💡 El bot envía con pausas inteligentes de <strong>8 a 13 segundos</strong> entre invitado e invitado para proteger tu número contra bloqueos de WhatsApp.
+        💡 El bot envía con pausas inteligentes de <strong>8 a 13 segundos</strong> entre cada invitado para proteger tu número contra bloqueos de WhatsApp.
       </p>
 
       <div style="display: flex; gap: 12px;">
         <button class="btn btn-primary" id="btnStartBulk" onclick="startBulk()">
-          💌 Iniciar Envío a Todos los Pendientes
+          💌 Iniciar Envío en PDF a Todos los Pendientes
         </button>
         <button class="btn btn-danger" id="btnStopBulk" onclick="stopBulk()" style="display: none; width: 180px;">
           ⏸️ Pausar
@@ -678,7 +695,7 @@ function renderHtml() {
           btnStopBulk.style.display = 'inline-flex';
         } else {
           btnStartBulk.disabled = (data.status !== 'connected');
-          btnStartBulk.textContent = '💌 Iniciar Envío a Todos los Pendientes';
+          btnStartBulk.textContent = '💌 Iniciar Envío en PDF a Todos los Pendientes';
           btnStopBulk.style.display = 'none';
         }
 
@@ -713,17 +730,17 @@ function renderHtml() {
     }
 
     async function sendTestTrio() {
-      if (!confirm('¿Deseas enviar la invitación de prueba a los 3 seleccionados: Luis y Julieth, Familia Galindo Moreno y Prueba Luisa?')) return;
+      if (!confirm('¿Deseas enviar la invitación oficial en PDF a los 3 seleccionados: Luis y Julieth, Familia Galindo Moreno y Prueba Luisa?')) return;
       
       const btn = document.getElementById('btnSendTrio');
       btn.disabled = true;
-      btn.textContent = 'Enviando a los 3...';
+      btn.textContent = 'Enviando PDFs a los 3...';
 
       try {
         const res = await fetch('/api/send-test-trio', { method: 'POST' });
         const data = await res.json();
         if (data.success) {
-          alert('🚀 Envío iniciado. Revisa la consola y tu WhatsApp para ver la entrega.');
+          alert('🚀 Envío iniciado. Revisa la consola y tu WhatsApp para ver la entrega de los PDFs.');
         } else {
           alert('❌ Error: ' + (data.error || 'No se pudo enviar'));
         }
@@ -731,7 +748,7 @@ function renderHtml() {
         alert('Error: ' + e.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = '🚀 Enviar Prueba a estos 3 Números';
+        btn.textContent = '🚀 Enviar PDF de Prueba a estos 3 Números';
         updateStatus();
       }
     }
@@ -745,30 +762,30 @@ function renderHtml() {
 
       const btn = document.getElementById('btnSendTest');
       btn.disabled = true;
-      btn.textContent = 'Enviando prueba...';
+      btn.textContent = 'Enviando PDF...';
 
       try {
         const res = await fetch('/api/send-test', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ phone, name, passes, slug: 'prueba' })
+          body: JSON.stringify({ phone, name, passes, slug: 'prueba-luisa' })
         });
         const data = await res.json();
         if (data.success) {
-          alert('✅ ¡Mensaje de prueba enviado exitosamente a ' + phone + '! Revisa tu WhatsApp.');
+          alert('✅ ¡Invitación en PDF enviada exitosamente a ' + phone + '! Revisa tu WhatsApp.');
         } else {
           alert('❌ Error: ' + (data.error || 'No se pudo enviar'));
         }
       } catch (e) {
-        alert('Error de conexión: ' + e.message);
+        alert('Error: ' + e.message);
       } finally {
         btn.disabled = false;
-        btn.textContent = '📤 Enviar 1 Mensaje Individual de Prueba';
+        btn.textContent = '📤 Enviar 1 Invitación en PDF de Prueba';
       }
     }
 
     async function startBulk() {
-      if (!confirm('¿Estás seguro de iniciar el envío masivo de invitaciones a todos los invitados pendientes?')) return;
+      if (!confirm('¿Estás seguro de iniciar el envío de las invitaciones en PDF a todos los invitados pendientes?')) return;
       await fetch('/api/start-bulk', { method: 'POST' });
       updateStatus();
     }
