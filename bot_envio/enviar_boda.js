@@ -163,16 +163,6 @@ async function initBaileys() {
       BotState.myPhone = rawId;
       addLog(`✅ ¡WHATSAPP VINCULADO EXITOSAMENTE! Conectado desde el número: +${rawId}`);
 
-      // Si se inició con parámetro --test, disparar automáticamente la prueba a los 3 invitados
-      if (process.argv.includes('--test')) {
-        addLog('🧪 MODO PRUEBA CLI DETECTADO: Disparando prueba en PDF a los 3 invitados en 4 segundos...');
-        setTimeout(async () => {
-          await runTrioSender();
-          console.log('\n=============================================================');
-          console.log('✅ PRUEBA EN PDF DE LOS 3 INVITADOS COMPLETADA.');
-          console.log('=============================================================\n');
-        }, 4000);
-      }
     }
   });
 }
@@ -204,11 +194,14 @@ async function sendMessageToJid(jid, guest, text) {
   if (fs.existsSync(pdfPath)) {
     const pdfBuffer = fs.readFileSync(pdfPath);
     const cleanFileName = `Invitación Oficial de Boda • ${guest.name}.pdf`;
+    const thumbPath = path.join(__dirname, '../assets/tarjeta_invitacion_thumb.jpg');
+    const thumbBuffer = fs.existsSync(thumbPath) ? fs.readFileSync(thumbPath) : undefined;
 
     await BotState.sock.sendMessage(jid, { 
       document: pdfBuffer, 
       mimetype: 'application/pdf',
       fileName: cleanFileName,
+      jpegThumbnail: thumbBuffer,
       caption: text 
     });
   } else {
@@ -217,43 +210,20 @@ async function sendMessageToJid(jid, guest, text) {
   }
 }
 
-// Envío de prueba a los 3 invitados específicos
-async function runTrioSender() {
-  const trio = [
-    GUESTS.find(g => g.id === 40), // Luis y Julieth (3204545796)
-    GUESTS.find(g => g.id === 45), // Familia Galindo Moreno (3213221773)
-    GUESTS.find(g => g.id === 53)  // Prueba Luisa (3172959658)
-  ].filter(Boolean);
+// Envío de prueba exclusivo al número de control (3204545796)
+async function runTestSender() {
+  const targetGuest = GUESTS.find(g => g.id === 40) || { name: 'Luis y Julieth', phone: '3204545796', passes: 2, slug: 'luis-y-julieth' };
+  const jid = formatJid('3204545796');
 
-  addLog(`🧪 INICIANDO PRUEBA DE 3 INVITADOS EN PDF:`);
-  addLog(`1. Luis y Julieth (3204545796)`);
-  addLog(`2. Familia Galindo Moreno (3213221773)`);
-  addLog(`3. Prueba Luisa (3172959658)`);
+  addLog(`🧪 Enviando prueba de PDF con miniatura a *${targetGuest.name}* (+57 3204545796)...`);
+  const message = buildMessage(targetGuest.name, targetGuest.passes);
 
-  for (let i = 0; i < trio.length; i++) {
-    const guest = trio[i];
-    const jid = formatJid(guest.phone);
-    if (!jid) continue;
-
-    addLog(`📄 [${i + 1}/${trio.length}] Enviando PDF oficial a *${guest.name}* (+${jid.replace('@s.whatsapp.net', '')})...`);
-    const message = buildMessage(guest.name, guest.passes);
-
-    try {
-      await sendMessageToJid(jid, guest, message);
-      addLog(`✅ [${i + 1}/${trio.length}] ¡PDF enviado con éxito a ${guest.name}!`);
-
-      if (i < trio.length - 1) {
-        const delay = 6;
-        addLog(`⏳ Esperando ${delay} segundos antes del siguiente mensaje de prueba...`);
-        await sleep(delay * 1000);
-      }
-    } catch (err) {
-      addLog(`❌ Error en prueba de ${guest.name}: ${err?.message || err}`);
-      await sleep(3000);
-    }
+  try {
+    await sendMessageToJid(jid, targetGuest, message);
+    addLog(`✅ ¡Prueba de PDF con previsualización enviada con éxito a ${targetGuest.name}!`);
+  } catch (err) {
+    addLog(`❌ Error en prueba: ${err?.message || err}`);
   }
-
-  addLog(`🎉 Prueba de los 3 invitados finalizada con éxito.`);
 }
 
 // Bucle de envío masivo
@@ -347,7 +317,7 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(400, { 'Content-Type': 'application/json' });
       return res.end(JSON.stringify({ error: 'WhatsApp no está conectado todavía. Por favor escanea el código QR primero.' }));
     }
-    runTrioSender();
+    runTestSender();
     res.writeHead(200, { 'Content-Type': 'application/json' });
     return res.end(JSON.stringify({ success: true }));
   }
