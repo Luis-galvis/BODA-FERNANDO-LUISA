@@ -778,8 +778,18 @@ body {
   font-size: 1.05rem;
   color: var(--color-text-muted);
   max-width: 90%;
-  margin: 0 auto 16px;
+  margin: 0 auto 6px;
   line-height: 1.5;
+}
+
+.quote-verse {
+  font-family: var(--font-display);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-gold-deep);
+  margin: 0 auto 14px;
 }
 
 .olive-divider {
