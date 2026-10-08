@@ -841,6 +841,9 @@
             <button class="rsvp-sync-btn" onclick="fetchCloudConfirmations()">
               🔄 Sincronizar en Vivo
             </button>
+            <button class="btn-export" onclick="restoreYesterdayConfirmations()" style="background: #2e7d32; color: #fff; font-weight: 700;" title="Restaurar automáticamente las 18 personas que confirmaron ayer por WhatsApp">
+              ⚡ Recuperar Confirmados de Ayer (18)
+            </button>
             <button class="btn-export" onclick="toggleManualRSVPPanel()" style="background: var(--color-gold-deep); color: #fff;">
               ➕ Registrar Confirmación
             </button>
@@ -1628,6 +1631,41 @@
       };
       reader.readAsText(file);
       event.target.value = '';
+    };
+
+    window.restoreYesterdayConfirmations = function() {
+      const yesterdayIds = [1, 2, 5, 17, 18, 19, 21, 22, 23, 25, 26, 35, 36, 37, 40, 42, 44, 49];
+      let localList = [];
+      try {
+        localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
+      } catch (e) { localList = []; }
+
+      yesterdayIds.forEach(id => {
+        const g = GUESTS.find(x => x.id === id);
+        if (g) {
+          guestStatuses[id] = 'confirmed';
+          const exists = localList.some(x => x.name && x.name.toLowerCase().trim() === g.name.toLowerCase().trim());
+          if (!exists) {
+            localList.push({
+              name: g.name,
+              attendance: 'si',
+              statusText: '¡Sí, asistiré con mucha alegría!',
+              message: 'Confirmado por WhatsApp ayer',
+              date: '2026-10-07T18:00:00.000Z'
+            });
+          }
+        }
+      });
+
+      saveGuestStatuses();
+      localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(localList));
+      cloudConfirmations = localList.slice().reverse();
+      renderConfirmationsList();
+      const badge = document.getElementById('tabBadgeRSVP');
+      if (badge) badge.textContent = cloudConfirmations.length;
+      renderGuests();
+      renderIndivTable();
+      showAdminToast(`⚡ ¡18 confirmados de ayer recuperados y sincronizados!`);
     };
 
     // =========================================================================
