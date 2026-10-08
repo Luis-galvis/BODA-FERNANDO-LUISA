@@ -10,8 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
-  <!-- Supabase Client -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   
   <style>
     :root {
@@ -1038,7 +1036,16 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-submit" style="margin-top: 14px;">💾 Guardar Cambi  <script type="module">
+          <button type="submit" class="btn-submit" style="margin-top: 14px;">💾 Guardar Cambios</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="toast" id="adminToast">¡Enlace copiado!</div>
+
+  <script type="module">
     import { GUESTS } from './data/guests.js';
 
     let currentPassFilter = 'all';
@@ -1047,16 +1054,65 @@
     let sentStatuses = {};
     let currentIndivGuestId = null;
 
-    // Conexión Supabase
+    // Conexión Supabase (Direct API REST nativa)
     const SUPABASE_URL = 'https://tapusiqdotxhtnyxavta.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_6YvmpwE3e3aF8D1FoFRMrQ_Zr4y28m5';
-    let supabase = null;
-    try {
-      if (window.supabase) {
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function updateGuestInSupabase(guestId, status) {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/wedding_guests?id=eq.${guestId}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            status: status,
+            updated_at: new Date().toISOString()
+          })
+        });
+        return res.ok;
+      } catch (err) {
+        console.error('Fetch Supabase update error:', err);
+        return false;
       }
-    } catch (e) {
-      console.warn('Supabase init:', e);
+    }
+
+    async function updateGuestSentInSupabase(guestId, sent) {
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/wedding_guests?id=eq.${guestId}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({
+            sent: !!sent,
+            updated_at: new Date().toISOString()
+          })
+        });
+      } catch (err) {}
+    }
+
+    async function fetchGuestsFromSupabase() {
+      try {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/wedding_guests?select=id,status,sent`, {
+          headers: {
+            'apikey': SUPABASE_ANON_KEY,
+            'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+          }
+        });
+        if (res.ok) {
+          return await res.json();
+        }
+      } catch (err) {
+        console.warn('Fetch Supabase guests error:', err);
+      }
+      return null;
     }
 
     // Cargar estados guardados de los invitados (confirmado, pendiente, declinado)
@@ -1082,12 +1138,9 @@
     }
 
     async function syncWithSupabase() {
-      if (!supabase) return;
       try {
-        const { data, error } = await supabase
-          .from('wedding_guests')
-          .select('id, status, sent');
-        if (!error && data && data.length > 0) {
+        const data = await fetchGuestsFromSupabase();
+        if (data && data.length > 0) {
           data.forEach(row => {
             if (row.id && row.status) {
               guestStatuses[row.id] = row.status;
@@ -1102,7 +1155,7 @@
           } catch(e) {}
           updateKPICounters();
           renderGuests();
-          if (document.getElementById('tab-individual').style.display !== 'none') {
+          if (document.getElementById('tab-individual') && document.getElementById('tab-individual').style.display !== 'none') {
             renderIndivTable();
           }
         }
@@ -1173,26 +1226,16 @@
       const stName = status === 'confirmed' ? '✅ Asiste' : status === 'declined' ? '❌ No Asiste' : '⏳ Pendiente';
       showAdminToast(`Guardando: ${stName}...`);
 
-      if (supabase) {
-        try {
-          const { error } = await supabase
-            .from('wedding_guests')
-            .update({ 
-              status: status, 
-              updated_at: new Date().toISOString() 
-            })
-            .eq('id', guestId);
-
-          if (error) {
-            console.error('Error actualizando estado en Supabase:', error);
-            showAdminToast(`⚠️ Guardado local (Error en BD: ${error.message})`);
-          } else {
-            showAdminToast(`✓ ${stName} guardado en la Base de Datos`);
-          }
-        } catch (e) {
-          console.error('Error al conectar con Supabase:', e);
+      try {
+        const ok = await updateGuestInSupabase(guestId, status);
+        if (ok) {
+          showAdminToast(`✓ ${stName} guardado en la Base de Datos`);
+        } else {
           showAdminToast(`✓ ${stName} guardado localmente`);
         }
+      } catch (e) {
+        console.error('Error al conectar con Supabase:', e);
+        showAdminToast(`✓ ${stName} guardado localmente`);
       }
     };
 
@@ -1367,11 +1410,9 @@
             try {
               localStorage.setItem('wedding_guest_rsvp_statuses', JSON.stringify(guestStatuses));
             } catch(err) {}
-            // Sincronizar masivamente a Supabase si está disponible
-            if (supabase) {
-              for (const [id, st] of Object.entries(guestStatuses)) {
-                await supabase.from('wedding_guests').update({ status: st, updated_at: new Date().toISOString() }).eq('id', parseInt(id, 10));
-              }
+            // Sincronizar masivamente a Supabase
+            for (const [id, st] of Object.entries(guestStatuses)) {
+              await updateGuestInSupabase(parseInt(id, 10), st);
             }
           }
           if (data.wedding_sent_status) {
@@ -1507,9 +1548,7 @@
       updateIndivSentButton();
       renderIndivTable();
       initIndividualSender(); // refrescar etiquetas en dropdown
-      if (supabase) {
-        supabase.from('wedding_guests').update({ sent: !!sentStatuses[currentIndivGuestId], updated_at: new Date().toISOString() }).eq('id', currentIndivGuestId).catch(console.warn);
-      }
+      updateGuestSentInSupabase(currentIndivGuestId, sentStatuses[currentIndivGuestId]);
       showAdminToast(sentStatuses[currentIndivGuestId] ? '✓ Marcado como entregado' : 'Marcado como pendiente');
     };
 
@@ -1572,9 +1611,7 @@
       renderIndivTable();
       if (currentIndivGuestId === guestId) updateIndivSentButton();
       initIndividualSender();
-      if (supabase) {
-        supabase.from('wedding_guests').update({ sent: !!sentStatuses[guestId], updated_at: new Date().toISOString() }).eq('id', guestId).catch(console.warn);
-      }
+      updateGuestSentInSupabase(guestId, sentStatuses[guestId]);
       showAdminToast('Estado de envío actualizado');
     };
 

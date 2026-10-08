@@ -749,24 +749,44 @@ window.handleRSVPSubmit = function(event) {
     date: new Date().toISOString()
   };
 
-  // 1. Enviar a la base de datos Supabase
+  // 1. Enviar a la base de datos Supabase (Direct REST API nativa)
   try {
-    if (window.supabase) {
-      const sbClient = window.supabase.createClient('https://tapusiqdotxhtnyxavta.supabase.co', 'sb_publishable_6YvmpwE3e3aF8D1FoFRMrQ_Zr4y28m5');
-      sbClient.from('wedding_rsvps').insert([{
+    const sbUrl = 'https://tapusiqdotxhtnyxavta.supabase.co';
+    const sbKey = 'sb_publishable_6YvmpwE3e3aF8D1FoFRMrQ_Zr4y28m5';
+    
+    // Guardar en tabla wedding_rsvps
+    fetch(`${sbUrl}/rest/v1/wedding_rsvps`, {
+      method: 'POST',
+      headers: {
+        'apikey': sbKey,
+        'Authorization': `Bearer ${sbKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({
         name: name,
         attendance: attendance,
         status_text: statusText,
         message: message,
         created_at: new Date().toISOString()
-      }]).then(() => {});
+      })
+    }).catch(() => {});
 
-      if (AppState.currentGuest && AppState.currentGuest.id) {
-        sbClient.from('wedding_guests').update({
+    // Actualizar estado del invitado en tabla wedding_guests
+    if (AppState.currentGuest && AppState.currentGuest.id) {
+      fetch(`${sbUrl}/rest/v1/wedding_guests?id=eq.${AppState.currentGuest.id}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': sbKey,
+          'Authorization': `Bearer ${sbKey}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
           status: attendance === 'si' ? 'confirmed' : 'declined',
           updated_at: new Date().toISOString()
-        }).eq('id', AppState.currentGuest.id).then(() => {});
-      }
+        })
+      }).catch(() => {});
     }
   } catch(err) {
     console.warn('Supabase save error:', err);
