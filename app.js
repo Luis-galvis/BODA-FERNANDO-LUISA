@@ -749,7 +749,31 @@ window.handleRSVPSubmit = function(event) {
     date: new Date().toISOString()
   };
 
-  // 1. Enviar a la nube (ntfy.sh) para sincronización en tiempo real con el Panel de Novios
+  // 1. Enviar a la base de datos Supabase
+  try {
+    if (window.supabase) {
+      const sbClient = window.supabase.createClient('https://tapusiqdotxhtnyxavta.supabase.co', 'sb_publishable_6YvmpwE3e3aF8D1FoFRMrQ_Zr4y28m5');
+      sbClient.from('wedding_rsvps').insert([{
+        name: name,
+        attendance: attendance,
+        status_text: statusText,
+        message: message,
+        created_at: new Date().toISOString()
+      }]).then(() => {});
+
+      if (AppState.currentGuest && AppState.currentGuest.id) {
+        sbClient.from('wedding_guests').upsert([{
+          id: AppState.currentGuest.id,
+          status: attendance === 'si' ? 'confirmed' : 'declined',
+          updated_at: new Date().toISOString()
+        }]).then(() => {});
+      }
+    }
+  } catch(err) {
+    console.warn('Supabase save error:', err);
+  }
+
+  // 2. Enviar a la nube (ntfy.sh) para sincronización en tiempo real con el Panel de Novios
   fetch('https://ntfy.sh/boda-edgar-fernando-luisa-fernanda-rsvp-2026', {
     method: 'POST',
     headers: {
@@ -760,7 +784,7 @@ window.handleRSVPSubmit = function(event) {
     body: JSON.stringify(payload)
   }).catch(err => console.warn('Sync cloud error:', err));
 
-  // 2. Guardar en almacenamiento local del dispositivo como respaldo
+  // 3. Guardar en almacenamiento local del dispositivo como respaldo
   try {
     const list = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
     list.push(payload);

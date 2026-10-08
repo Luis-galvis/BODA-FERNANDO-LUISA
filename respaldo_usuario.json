@@ -1,0 +1,58 @@
+{
+  "wedding_guest_rsvp_statuses": {
+    "1": "pending",
+    "2": "pending",
+    "4": "confirmed",
+    "5": "pending",
+    "8": "confirmed",
+    "14": "confirmed",
+    "16": "confirmed",
+    "17": "confirmed",
+    "18": "confirmed",
+    "19": "pending",
+    "20": "confirmed",
+    "21": "pending",
+    "22": "pending",
+    "23": "pending",
+    "25": "pending",
+    "26": "pending",
+    "27": "confirmed",
+    "28": "confirmed",
+    "29": "confirmed",
+    "30": "confirmed",
+    "31": "confirmed",
+    "32": "confirmed",
+    "34": "confirmed",
+    "35": "confirmed",
+    "36": "confirmed",
+    "37": "confirmed",
+    "38": "confirmed",
+    "39": "confirmed",
+    "40": "confirmed",
+    "41": "confirmed",
+    "42": "confirmed",
+    "43": "confirmed",
+    "44": "confirmed",
+    "46": "confirmed",
+    "47": "confirmed",
+    "49": "confirmed"
+  },
+  "wedding_rsvp_confirmations": [
+    {
+      "name": "Katalina",
+      "attendance": "si",
+      "statusText": "¡Sí, asistiré con mucha alegría!",
+      "message": "",
+      "date": "2026-10-08T11:50:34.710Z"
+    },
+    {
+      "name": "Luis y Sandra",
+      "attendance": "si",
+      "statusText": "¡Sí, asistiré con mucha alegría!",
+      "message": "Que el señor siga bendiciendo esta unión de tantos años y ahora mucho más por qué eran bajo su bendición los queremos  mucho y damos gracias por tenernos presentes para este día tan especial",
+      "date": "2026-10-08T11:53:41.420Z"
+    }
+  ],
+  "wedding_sent_status": {},
+  "exportedAt": "2026-10-08T17:59:06.614Z"
+}

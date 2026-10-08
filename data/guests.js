@@ -1,5 +1,5 @@
 // Lista oficial de invitados para la boda
-// Extraccion definitiva y validada segun lista oficial de novios (50 invitados, 88 pases)
+// Total: 50 invitaciones | Confirmados: 27 (49 pases) | Pendientes: 23 (39 pases)
 export const GUESTS = [
   {
     "id": 1,
@@ -7,7 +7,8 @@ export const GUESTS = [
     "name": "German y Mary",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3148942664"
+    "phone": "3148942664",
+    "status": "pending"
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@ export const GUESTS = [
     "name": "Angela y Gaby",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3102227404"
+    "phone": "3102227404",
+    "status": "pending"
   },
   {
     "id": 3,
@@ -23,7 +25,8 @@ export const GUESTS = [
     "name": "Argenis",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3213612986"
+    "phone": "3213612986",
+    "status": "pending"
   },
   {
     "id": 4,
@@ -31,7 +34,8 @@ export const GUESTS = [
     "name": "Luis y Sandra",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3006517876"
+    "phone": "3006517876",
+    "status": "confirmed"
   },
   {
     "id": 5,
@@ -39,7 +43,8 @@ export const GUESTS = [
     "name": "Juan y Paola",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3007582252"
+    "phone": "3007582252",
+    "status": "pending"
   },
   {
     "id": 6,
@@ -47,7 +52,8 @@ export const GUESTS = [
     "name": "Jorge y Alejandra",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3134750682"
+    "phone": "3134750682",
+    "status": "pending"
   },
   {
     "id": 7,
@@ -55,7 +61,8 @@ export const GUESTS = [
     "name": "Enrique y Anita",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3142457298"
+    "phone": "3142457298",
+    "status": "pending"
   },
   {
     "id": 8,
@@ -63,7 +70,8 @@ export const GUESTS = [
     "name": "Alejo y Kelly",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3143119452"
+    "phone": "3143119452",
+    "status": "confirmed"
   },
   {
     "id": 9,
@@ -71,7 +79,8 @@ export const GUESTS = [
     "name": "Wilson",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3144262888"
+    "phone": "3144262888",
+    "status": "pending"
   },
   {
     "id": 10,
@@ -79,7 +88,8 @@ export const GUESTS = [
     "name": "Ferenc y Diana",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3153148043"
+    "phone": "3153148043",
+    "status": "pending"
   },
   {
     "id": 11,
@@ -87,7 +97,8 @@ export const GUESTS = [
     "name": "Daniel",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3163009310"
+    "phone": "3163009310",
+    "status": "pending"
   },
   {
     "id": 12,
@@ -95,7 +106,8 @@ export const GUESTS = [
     "name": "Fabian Moreno",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3174409887"
+    "phone": "3174409887",
+    "status": "pending"
   },
   {
     "id": 13,
@@ -103,7 +115,8 @@ export const GUESTS = [
     "name": "Johnatan y Natalie",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3183904862"
+    "phone": "3183904862",
+    "status": "pending"
   },
   {
     "id": 14,
@@ -111,7 +124,8 @@ export const GUESTS = [
     "name": "Yeisson y Lorena",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3214900317"
+    "phone": "3214900317",
+    "status": "confirmed"
   },
   {
     "id": 15,
@@ -119,7 +133,8 @@ export const GUESTS = [
     "name": "Marcela",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3128813030"
+    "phone": "3128813030",
+    "status": "pending"
   },
   {
     "id": 16,
@@ -127,7 +142,8 @@ export const GUESTS = [
     "name": "Katalina",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3161958838"
+    "phone": "3161958838",
+    "status": "confirmed"
   },
   {
     "id": 17,
@@ -135,7 +151,8 @@ export const GUESTS = [
     "name": "Norma",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3053473390"
+    "phone": "3053473390",
+    "status": "confirmed"
   },
   {
     "id": 18,
@@ -143,7 +160,8 @@ export const GUESTS = [
     "name": "Xiomara",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3106959140"
+    "phone": "3106959140",
+    "status": "confirmed"
   },
   {
     "id": 19,
@@ -151,7 +169,8 @@ export const GUESTS = [
     "name": "Andrea",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3148942658"
+    "phone": "3148942658",
+    "status": "pending"
   },
   {
     "id": 20,
@@ -159,7 +178,8 @@ export const GUESTS = [
     "name": "Nubia",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3123962885"
+    "phone": "3123962885",
+    "status": "confirmed"
   },
   {
     "id": 21,
@@ -167,7 +187,8 @@ export const GUESTS = [
     "name": "Jairo e Irma",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3155451681"
+    "phone": "3155451681",
+    "status": "pending"
   },
   {
     "id": 22,
@@ -175,7 +196,8 @@ export const GUESTS = [
     "name": "Oscar y Lina",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3168258737"
+    "phone": "3168258737",
+    "status": "pending"
   },
   {
     "id": 23,
@@ -183,7 +205,8 @@ export const GUESTS = [
     "name": "Martha Diaz",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3216770790"
+    "phone": "3216770790",
+    "status": "pending"
   },
   {
     "id": 24,
@@ -191,7 +214,8 @@ export const GUESTS = [
     "name": "Ciro y Adriana",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3162543924"
+    "phone": "3162543924",
+    "status": "pending"
   },
   {
     "id": 25,
@@ -199,7 +223,8 @@ export const GUESTS = [
     "name": "Miryam",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3125429353"
+    "phone": "3125429353",
+    "status": "pending"
   },
   {
     "id": 26,
@@ -207,7 +232,8 @@ export const GUESTS = [
     "name": "Familia Guzman Moreno",
     "passes": 5,
     "reservaText": "Esta invitación está reservada para 5 personas",
-    "phone": "3176999226"
+    "phone": "3176999226",
+    "status": "pending"
   },
   {
     "id": 27,
@@ -215,7 +241,8 @@ export const GUESTS = [
     "name": "Camilo",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3023631131"
+    "phone": "3023631131",
+    "status": "confirmed"
   },
   {
     "id": 28,
@@ -223,7 +250,8 @@ export const GUESTS = [
     "name": "Mayra",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3118965505"
+    "phone": "3118965505",
+    "status": "confirmed"
   },
   {
     "id": 29,
@@ -231,7 +259,8 @@ export const GUESTS = [
     "name": "Leidy",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3115698018"
+    "phone": "3115698018",
+    "status": "confirmed"
   },
   {
     "id": 30,
@@ -239,7 +268,8 @@ export const GUESTS = [
     "name": "Raul y Sandra",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3015092937"
+    "phone": "3015092937",
+    "status": "confirmed"
   },
   {
     "id": 31,
@@ -247,7 +277,8 @@ export const GUESTS = [
     "name": "Liss y Vivi",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3045512639"
+    "phone": "3045512639",
+    "status": "confirmed"
   },
   {
     "id": 32,
@@ -255,7 +286,8 @@ export const GUESTS = [
     "name": "Familia Orozco Moreno",
     "passes": 4,
     "reservaText": "Esta invitación está reservada para 4 personas",
-    "phone": "3046808114"
+    "phone": "3046808114",
+    "status": "confirmed"
   },
   {
     "id": 33,
@@ -263,7 +295,8 @@ export const GUESTS = [
     "name": "Alberto y Edith",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3123633979"
+    "phone": "3123633979",
+    "status": "pending"
   },
   {
     "id": 34,
@@ -271,7 +304,8 @@ export const GUESTS = [
     "name": "Jairo y Diana",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3134699155"
+    "phone": "3134699155",
+    "status": "confirmed"
   },
   {
     "id": 35,
@@ -279,7 +313,8 @@ export const GUESTS = [
     "name": "Oscar y Blanca",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3178492983"
+    "phone": "3178492983",
+    "status": "confirmed"
   },
   {
     "id": 36,
@@ -287,7 +322,8 @@ export const GUESTS = [
     "name": "Maria Jose",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3187026437"
+    "phone": "3187026437",
+    "status": "confirmed"
   },
   {
     "id": 37,
@@ -295,7 +331,8 @@ export const GUESTS = [
     "name": "Luis y Julieth",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3204545796"
+    "phone": "3204545796",
+    "status": "confirmed"
   },
   {
     "id": 38,
@@ -303,7 +340,8 @@ export const GUESTS = [
     "name": "Fernando y Alejandra",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3205582770"
+    "phone": "3205582770",
+    "status": "confirmed"
   },
   {
     "id": 39,
@@ -311,7 +349,8 @@ export const GUESTS = [
     "name": "Yesid y Martha",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3205633432"
+    "phone": "3205633432",
+    "status": "confirmed"
   },
   {
     "id": 40,
@@ -319,7 +358,8 @@ export const GUESTS = [
     "name": "Santiago y Valen",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3212082769"
+    "phone": "3212082769",
+    "status": "confirmed"
   },
   {
     "id": 41,
@@ -327,7 +367,8 @@ export const GUESTS = [
     "name": "Camilo y Lina",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3212318833"
+    "phone": "3212318833",
+    "status": "confirmed"
   },
   {
     "id": 42,
@@ -335,7 +376,8 @@ export const GUESTS = [
     "name": "Familia Galindo Moreno",
     "passes": 3,
     "reservaText": "Esta invitación está reservada para 3 personas",
-    "phone": "3213221773"
+    "phone": "3213221773",
+    "status": "confirmed"
   },
   {
     "id": 43,
@@ -343,7 +385,8 @@ export const GUESTS = [
     "name": "Familia Moreno Gonzalez",
     "passes": 4,
     "reservaText": "Esta invitación está reservada para 4 personas",
-    "phone": "3222307829"
+    "phone": "3222307829",
+    "status": "confirmed"
   },
   {
     "id": 44,
@@ -351,7 +394,8 @@ export const GUESTS = [
     "name": "Victor y Xilenia",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3228452238"
+    "phone": "3228452238",
+    "status": "confirmed"
   },
   {
     "id": 45,
@@ -359,7 +403,8 @@ export const GUESTS = [
     "name": "Alexis Rubiano & Sra",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3148942652"
+    "phone": "3148942652",
+    "status": "pending"
   },
   {
     "id": 46,
@@ -367,7 +412,8 @@ export const GUESTS = [
     "name": "Javier & Sra",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3045963615"
+    "phone": "3045963615",
+    "status": "confirmed"
   },
   {
     "id": 47,
@@ -375,7 +421,8 @@ export const GUESTS = [
     "name": "Yeison",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3154383970"
+    "phone": "3154383970",
+    "status": "confirmed"
   },
   {
     "id": 48,
@@ -383,7 +430,8 @@ export const GUESTS = [
     "name": "Daniela",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3175844709"
+    "phone": "3175844709",
+    "status": "pending"
   },
   {
     "id": 49,
@@ -391,7 +439,8 @@ export const GUESTS = [
     "name": "Juan Pablo",
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
-    "phone": "3178688336"
+    "phone": "3178688336",
+    "status": "confirmed"
   },
   {
     "id": 50,
@@ -399,7 +448,8 @@ export const GUESTS = [
     "name": "Julian y Camila",
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
-    "phone": "3125304333"
+    "phone": "3125304333",
+    "status": "pending"
   }
 ];
 

@@ -28,6 +28,9 @@ sub_fill = PatternFill(start_color="C5A059", end_color="C5A059", fill_type="soli
 total_fill = PatternFill(start_color="FAF4E6", end_color="FAF4E6", fill_type="solid")
 zebra_fill = PatternFill(start_color="F9FAF8", end_color="F9FAF8", fill_type="solid")
 
+conf_fill = PatternFill(start_color="E8F5E9", end_color="E8F5E9", fill_type="solid")
+pend_fill = PatternFill(start_color="FFF3E0", end_color="FFF3E0", fill_type="solid")
+
 thin_border = Border(
     left=Side(style='thin', color='DDDDDD'),
     right=Side(style='thin', color='DDDDDD'),
@@ -40,7 +43,7 @@ total_border = Border(
 )
 
 # Título principal
-ws.merge_cells("A1:F1")
+ws.merge_cells("A1:G1")
 title_cell = ws["A1"]
 title_cell.value = "💍 LISTA OFICIAL DE INVITADOS Y PASES • BODA FERNANDO & LUISA FERNANDA"
 title_cell.font = Font(name="Segoe UI", size=14, bold=True, color="FFFFFF")
@@ -51,10 +54,14 @@ ws.row_dimensions[1].height = 36
 # Resumen rápido
 total_invitaciones = len(guests)
 total_pases = sum(g.get("passes", 1) for g in guests)
+conf_inv = sum(1 for g in guests if g.get("status") == "confirmed")
+conf_pases = sum(g.get("passes", 1) for g in guests if g.get("status") == "confirmed")
+pend_inv = sum(1 for g in guests if g.get("status") != "confirmed")
+pend_pases = sum(g.get("passes", 1) for g in guests if g.get("status") != "confirmed")
 
-ws.merge_cells("A2:F2")
+ws.merge_cells("A2:G2")
 sub_cell = ws["A2"]
-sub_cell.value = f"📊 Total de Invitaciones (Mensajes): {total_invitaciones}   |   👥 Total de Pases / Personas Estimadas: {total_pases} pases"
+sub_cell.value = f"📊 Total: {total_invitaciones} Inv ({total_pases} pases)   |   ✅ Confirmados: {conf_inv} Inv ({conf_pases} pases)   |   ⏳ Pendientes: {pend_inv} Inv ({pend_pases} pases)"
 sub_cell.font = Font(name="Segoe UI", size=11, bold=True, color="FFFFFF")
 sub_cell.fill = sub_fill
 sub_cell.alignment = Alignment(horizontal="center", vertical="center")
@@ -70,6 +77,7 @@ headers = [
     "Teléfono WhatsApp",
     "Pases (Cupos)",
     "Categoría",
+    "Estado RSVP",
     "Enlace Tarjeta Interactiva"
 ]
 
@@ -88,6 +96,7 @@ for idx, g in enumerate(guests, 1):
     passes = g.get("passes", 1)
     phone = g.get("phone", "")
     slug = g.get("slug", "")
+    status = g.get("status", "pending")
     link = f"https://boda-fernando-luisa.vercel.app/index.html?invitado={slug}"
 
     if passes == 1:
@@ -99,32 +108,45 @@ for idx, g in enumerate(guests, 1):
     else:
         cat = "General"
 
+    st_label = "✅ Confirmado" if status == "confirmed" else "⏳ Pendiente"
+
     c_id = ws.cell(row=row_num, column=1, value=g.get("id", idx))
     c_name = ws.cell(row=row_num, column=2, value=g.get("name", ""))
     c_phone = ws.cell(row=row_num, column=3, value=phone)
     c_passes = ws.cell(row=row_num, column=4, value=passes)
     c_cat = ws.cell(row=row_num, column=5, value=cat)
-    c_link = ws.cell(row=row_num, column=6, value=link)
+    c_status = ws.cell(row=row_num, column=6, value=st_label)
+    c_link = ws.cell(row=row_num, column=7, value=link)
 
     c_id.alignment = Alignment(horizontal="center", vertical="center")
     c_name.alignment = Alignment(horizontal="left", vertical="center")
     c_phone.alignment = Alignment(horizontal="center", vertical="center")
     c_passes.alignment = Alignment(horizontal="center", vertical="center")
     c_cat.alignment = Alignment(horizontal="center", vertical="center")
+    c_status.alignment = Alignment(horizontal="center", vertical="center")
     c_link.alignment = Alignment(horizontal="left", vertical="center")
 
     c_name.font = Font(name="Segoe UI", size=10, bold=True)
     c_passes.font = Font(name="Segoe UI", size=11, bold=True, color="3A472C")
+    
+    if status == "confirmed":
+        c_status.font = Font(name="Segoe UI", size=10, bold=True, color="2E7D32")
+        c_status.fill = conf_fill
+    else:
+        c_status.font = Font(name="Segoe UI", size=10, color="EF6C00")
+        c_status.fill = pend_fill
+
     c_link.font = Font(name="Segoe UI", size=9, color="2E5B82", underline="single")
     c_link.hyperlink = link
 
     # Alternado de filas
     fill = zebra_fill if idx % 2 == 0 else PatternFill(fill_type=None)
-    for col in range(1, 7):
+    for col in [1, 2, 3, 4, 5, 7]:
         cell = ws.cell(row=row_num, column=col)
         if fill.fill_type:
             cell.fill = fill
         cell.border = thin_border
+    ws.cell(row=row_num, column=6).border = thin_border
 
     ws.row_dimensions[row_num].height = 20
     row_num += 1
@@ -147,7 +169,13 @@ ws.cell(row=row_num, column=5, value=f"{total_pases} Personas")
 ws.cell(row=row_num, column=5).alignment = Alignment(horizontal="center", vertical="center")
 ws.cell(row=row_num, column=5).font = Font(name="Segoe UI", size=10, bold=True)
 
-for col in range(1, 7):
+ws.cell(row=row_num, column=6, value=f"{conf_inv} Conf / {pend_inv} Pend")
+ws.cell(row=row_num, column=6).alignment = Alignment(horizontal="center", vertical="center")
+ws.cell(row=row_num, column=6).font = Font(name="Segoe UI", size=10, bold=True, color="2C3821")
+
+ws.cell(row=row_num, column=7, value="")
+
+for col in range(1, 8):
     cell = ws.cell(row=row_num, column=col)
     cell.fill = total_fill
     cell.border = total_border
@@ -161,7 +189,8 @@ col_widths = {
     3: 20,
     4: 16,
     5: 18,
-    6: 55
+    6: 18,
+    7: 55
 }
 for col, width in col_widths.items():
     ws.column_dimensions[get_column_letter(col)].width = width

@@ -10,6 +10,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:wght@400;600;700&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
   <style>
     :root {
       --color-olive-dark: #2c3821;
@@ -747,14 +750,14 @@
 
       <div class="metric-card card-success">
         <span class="metric-label">Confirmados</span>
-        <span class="metric-value" style="color: var(--color-success);" id="kpiConfirmed">0</span>
-        <span class="metric-desc" id="kpiConfirmedPasses">0 personas confirmadas</span>
+        <span class="metric-value" style="color: var(--color-success);" id="kpiConfirmed">27</span>
+        <span class="metric-desc" id="kpiConfirmedPasses">49 personas confirmadas</span>
       </div>
 
       <div class="metric-card card-warning">
         <span class="metric-label">Por Confirmar</span>
-        <span class="metric-value" style="color: var(--color-warning);" id="kpiPending">50</span>
-        <span class="metric-desc" id="kpiPendingPasses">88 personas pendientes</span>
+        <span class="metric-value" style="color: var(--color-warning);" id="kpiPending">23</span>
+        <span class="metric-desc" id="kpiPendingPasses">39 personas pendientes</span>
       </div>
 
       <div class="metric-card card-danger">
@@ -841,8 +844,8 @@
             <button class="rsvp-sync-btn" onclick="fetchCloudConfirmations()">
               🔄 Sincronizar en Vivo
             </button>
-            <button class="btn-export" onclick="restoreYesterdayConfirmations()" style="background: #2e7d32; color: #fff; font-weight: 700;" title="Restaurar automáticamente las 19 personas que confirmaron por WhatsApp">
-              ⚡ Recuperar Confirmados (19)
+            <button class="btn-export" onclick="restoreYesterdayConfirmations()" style="background: #2e7d32; color: #fff; font-weight: 700;" title="Dejar únicamente los 3 confirmados 100% verificados (Katalina, Luis y Sandra, Raul y Sandra)">
+              🧹 Dejar Solo Confirmados Reales (3)
             </button>
             <button class="btn-export" onclick="toggleManualRSVPPanel()" style="background: var(--color-gold-deep); color: #fff;">
               ➕ Registrar Confirmación
@@ -1126,16 +1129,68 @@
     let cloudConfirmations = [];
     let currentIndivGuestId = null;
 
+    // Conexión Supabase
+    const SUPABASE_URL = 'https://tapusiqdotxhtnyxavta.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_6YvmpwE3e3aF8D1FoFRMrQ_Zr4y28m5';
+    let supabase = null;
+    try {
+      if (window.supabase) {
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      }
+    } catch (e) {
+      console.warn('Supabase init:', e);
+    }
+
     // Cargar estados guardados de los invitados (confirmado, pendiente, declinado)
     function loadGuestStatuses() {
+      // 1. Estados base oficiales de data/guests.js (27 confirmados, 23 pendientes)
+      GUESTS.forEach(g => {
+        guestStatuses[g.id] = g.status || 'pending';
+      });
+
+      // 2. Fusionar con cualquier cambio guardado en el navegador
       try {
         const saved = localStorage.getItem('wedding_guest_rsvp_statuses');
         if (saved) {
-          guestStatuses = JSON.parse(saved);
+          const localParsed = JSON.parse(saved);
+          guestStatuses = { ...guestStatuses, ...localParsed };
         }
       } catch (e) {
-        guestStatuses = {};
+        console.error(e);
       }
+
+      // 3. Sincronizar con Supabase en tiempo real
+      syncWithSupabase();
+    }
+
+    async function syncWithSupabase() {
+      if (!supabase) return;
+      try {
+        const { data, error } = await supabase.from('wedding_guests').select('*');
+        if (!error && data && data.length > 0) {
+          data.forEach(row => {
+            if (row.id && row.status) {
+              guestStatuses[row.id] = row.status;
+            }
+          });
+          updateKPICounters();
+          renderGuests();
+        }
+      } catch (err) {
+        // Silencioso si la tabla no existe aún
+      }
+    }
+
+    async function saveStatusesToSupabase() {
+      if (!supabase) return;
+      try {
+        const updates = Object.keys(guestStatuses).map(id => ({
+          id: parseInt(id, 10),
+          status: guestStatuses[id],
+          updated_at: new Date().toISOString()
+        }));
+        await supabase.from('wedding_guests').upsert(updates);
+      } catch (err) {}
     }
 
     function saveGuestStatuses() {
@@ -1145,6 +1200,7 @@
         console.error(e);
       }
       updateKPICounters();
+      saveStatusesToSupabase();
     }
 
     // Cargar historial de tarjetas enviadas
@@ -1344,80 +1400,66 @@
     // =========================================================================
     // CONFIRMACIONES ONLINE (RSVP EN TIEMPO REAL DESDE NTFY.SH + LOCAL PERSISTENTE)
     // =========================================================================
-    window.fetchCloudConfirmations = function() {
+    window.fetchCloudConfirmations = async function() {
       const container = document.getElementById('rsvpConfirmationsContainer');
       const badge = document.getElementById('tabBadgeRSVP');
       if (container) {
         container.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);">Sincronizando confirmaciones en línea...</div>`;
       }
 
-      // 1. Obtener de localStorage primero (persistencia permanente)
       let localList = [];
       try {
         localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
-      } catch (e) {
-        localList = [];
+      } catch (e) { localList = []; }
+
+      // 1. Consultar base de datos Supabase
+      let supabaseList = [];
+      if (supabase) {
+        try {
+          const { data, error } = await supabase.from('wedding_rsvps').select('*').order('created_at', { ascending: false });
+          if (!error && data && data.length > 0) {
+            supabaseList = data.map(d => ({
+              id: d.id,
+              name: d.name,
+              attendance: d.attendance,
+              statusText: d.status_text,
+              message: d.message,
+              date: d.created_at
+            }));
+          }
+        } catch(err) {
+          console.warn('Supabase fetch rsvps warning:', err);
+        }
       }
 
-      // 2. Consultar mensajes en la nube de ntfy.sh
-      fetch('https://ntfy.sh/boda-edgar-fernando-luisa-fernanda-rsvp-2026/json?poll=1')
-        .then(res => res.text())
-        .then(text => {
-          const lines = text.trim().split('\n').filter(Boolean);
-          const cloudList = [];
+      // 2. Combinar con localStorage
+      const combined = [...supabaseList];
+      localList.forEach(l => {
+        const exists = combined.some(x => x.name && l.name && x.name.toLowerCase().trim() === l.name.toLowerCase().trim());
+        if (!exists) combined.push(l);
+      });
 
-          lines.forEach(l => {
-            try {
-              const data = JSON.parse(l);
-              if (data.event === 'message' && data.message) {
-                const parsed = JSON.parse(data.message);
-                cloudList.push(parsed);
-              }
-            } catch (err) {}
-          });
+      try {
+        localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(combined));
+      } catch (e) {}
 
-          // Combinar y eliminar duplicados por nombre y fecha
-          const combined = [...localList];
-          cloudList.forEach(c => {
-            const exists = combined.some(x => 
-              x.name && c.name && 
-              x.name.toLowerCase().trim() === c.name.toLowerCase().trim() && 
-              (Math.abs(new Date(x.date || 0) - new Date(c.date || 0)) < 60000 || !x.date)
-            );
-            if (!exists) combined.push(c);
-          });
+      // Auto-sincronizar estados en la lista oficial
+      combined.forEach(c => {
+        const isYes = c.attendance === 'si';
+        const matched = GUESTS.find(g => 
+          (g.name && c.name && g.name.toLowerCase().trim() === c.name.toLowerCase().trim()) ||
+          (g.name && c.name && g.name.toLowerCase().includes(c.name.toLowerCase())) ||
+          (c.name && g.name && c.name.toLowerCase().includes(g.name.toLowerCase()))
+        );
+        if (matched && (!guestStatuses[matched.id] || guestStatuses[matched.id] === 'pending')) {
+          guestStatuses[matched.id] = isYes ? 'confirmed' : 'declined';
+        }
+      });
+      saveGuestStatuses();
 
-          // Guardar de inmediato en localStorage para que NUNCA se pierdan a las 12 horas
-          try {
-            localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(combined));
-          } catch (e) {
-            console.error(e);
-          }
-
-          // Auto-sincronizar estados en la lista oficial
-          combined.forEach(c => {
-            const isYes = c.attendance === 'si';
-            const matched = GUESTS.find(g => 
-              (g.name && c.name && g.name.toLowerCase().trim() === c.name.toLowerCase().trim()) ||
-              (g.name && c.name && g.name.toLowerCase().includes(c.name.toLowerCase())) ||
-              (c.name && g.name && c.name.toLowerCase().includes(g.name.toLowerCase()))
-            );
-            if (matched && (!guestStatuses[matched.id] || guestStatuses[matched.id] === 'pending')) {
-              guestStatuses[matched.id] = isYes ? 'confirmed' : 'declined';
-            }
-          });
-          saveGuestStatuses();
-
-          cloudConfirmations = combined.slice().reverse(); // más recientes primero
-          renderConfirmationsList();
-          if (badge) badge.textContent = cloudConfirmations.length;
-        })
-        .catch(err => {
-          console.warn('Error fetching cloud confirmations:', err);
-          cloudConfirmations = localList.slice().reverse();
-          renderConfirmationsList();
-          if (badge) badge.textContent = cloudConfirmations.length;
-        });
+      cloudConfirmations = combined;
+      renderConfirmationsList();
+      if (badge) badge.textContent = cloudConfirmations.length;
     };
 
     function renderConfirmationsList() {
@@ -1634,38 +1676,45 @@
     };
 
     window.restoreYesterdayConfirmations = function() {
-      const yesterdayIds = [1, 2, 5, 17, 18, 19, 21, 22, 23, 25, 26, 30, 35, 36, 37, 40, 42, 49];
-      let localList = [];
-      try {
-        localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
-      } catch (e) { localList = []; }
+      guestStatuses = {
+        4: 'confirmed',
+        16: 'confirmed',
+        30: 'confirmed'
+      };
 
-      yesterdayIds.forEach(id => {
-        const g = GUESTS.find(x => x.id === id);
-        if (g) {
-          guestStatuses[id] = 'confirmed';
-          const exists = localList.some(x => x.name && x.name.toLowerCase().trim() === g.name.toLowerCase().trim());
-          if (!exists) {
-            localList.push({
-              name: g.name,
-              attendance: 'si',
-              statusText: '¡Sí, asistiré con mucha alegría!',
-              message: 'Confirmado por WhatsApp ayer',
-              date: '2026-10-07T18:00:00.000Z'
-            });
-          }
+      const verifiedList = [
+        {
+          name: "Raul y Sandra",
+          attendance: "si",
+          statusText: "¡Sí, asistiré con mucha alegría!",
+          message: "Confirmado por WhatsApp",
+          date: "2026-10-07T19:45:00.000Z"
+        },
+        {
+          name: "Katalina",
+          attendance: "si",
+          statusText: "¡Sí, asistiré con mucha alegría!",
+          message: "",
+          date: "2026-10-08T06:50:00.000Z"
+        },
+        {
+          name: "Luis y Sandra",
+          attendance: "si",
+          statusText: "¡Sí, asistiré con mucha alegría!",
+          message: "Que el señor siga bendiciendo esta unión de tantos años y ahora mucho más por qué eran bajo su bendición los queremos mucho y damos gracias por tenernos presentes para este día tan especial",
+          date: "2026-10-08T06:53:00.000Z"
         }
-      });
+      ];
 
       saveGuestStatuses();
-      localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(localList));
-      cloudConfirmations = localList.slice().reverse();
+      localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(verifiedList));
+      cloudConfirmations = verifiedList.slice().reverse();
       renderConfirmationsList();
       const badge = document.getElementById('tabBadgeRSVP');
       if (badge) badge.textContent = cloudConfirmations.length;
       renderGuests();
       renderIndivTable();
-      showAdminToast(`⚡ ¡18 confirmados de ayer recuperados y sincronizados!`);
+      showAdminToast(`✓ Lista limpia: 3 confirmados reales activos`);
     };
 
     // =========================================================================
