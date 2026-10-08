@@ -841,8 +841,8 @@
             <button class="rsvp-sync-btn" onclick="fetchCloudConfirmations()">
               🔄 Sincronizar en Vivo
             </button>
-            <button class="btn-export" onclick="restoreYesterdayConfirmations()" style="background: #2e7d32; color: #fff; font-weight: 700;" title="Restaurar automáticamente las 18 personas que confirmaron ayer por WhatsApp">
-              ⚡ Recuperar Confirmados de Ayer (18)
+            <button class="btn-export" onclick="restoreYesterdayConfirmations()" style="background: #2e7d32; color: #fff; font-weight: 700;" title="Restaurar automáticamente las 19 personas que confirmaron por WhatsApp">
+              ⚡ Recuperar Confirmados (19)
             </button>
             <button class="btn-export" onclick="toggleManualRSVPPanel()" style="background: var(--color-gold-deep); color: #fff;">
               ➕ Registrar Confirmación
@@ -1634,7 +1634,7 @@
     };
 
     window.restoreYesterdayConfirmations = function() {
-      const yesterdayIds = [1, 2, 5, 17, 18, 19, 21, 22, 23, 25, 26, 35, 36, 37, 40, 42, 44, 49];
+      const yesterdayIds = [1, 2, 5, 17, 18, 19, 21, 22, 23, 25, 26, 30, 35, 36, 37, 40, 42, 49];
       let localList = [];
       try {
         localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');

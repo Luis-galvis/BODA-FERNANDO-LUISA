@@ -13,12 +13,12 @@
     "23": "confirmed",
     "25": "confirmed",
     "26": "confirmed",
+    "30": "confirmed",
     "35": "confirmed",
     "36": "confirmed",
     "37": "confirmed",
     "40": "confirmed",
     "42": "confirmed",
-    "44": "confirmed",
     "49": "confirmed"
   },
   "wedding_rsvp_confirmations": [
@@ -100,6 +100,13 @@
       "date": "2026-10-07T19:30:00.000Z"
     },
     {
+      "name": "Raul y Sandra",
+      "attendance": "si",
+      "statusText": "¡Sí, asistiré con mucha alegría!",
+      "message": "Confirmado por WhatsApp",
+      "date": "2026-10-07T19:45:00.000Z"
+    },
+    {
       "name": "Oscar y Blanca",
       "attendance": "si",
       "statusText": "¡Sí, asistiré con mucha alegría!",
@@ -133,13 +140,6 @@
       "statusText": "¡Sí, asistiré con mucha alegría!",
       "message": "Confirmado por WhatsApp",
       "date": "2026-10-07T21:30:00.000Z"
-    },
-    {
-      "name": "Victor y Xilenia",
-      "attendance": "si",
-      "statusText": "¡Sí, asistiré con mucha alegría!",
-      "message": "Confirmado por WhatsApp",
-      "date": "2026-10-07T22:00:00.000Z"
     },
     {
       "name": "Juan Pablo",
