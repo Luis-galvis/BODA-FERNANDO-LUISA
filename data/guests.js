@@ -1,5 +1,5 @@
 // Lista oficial de invitados para la boda
-// Extraccion definitiva y validada segun lista oficial de novios (49 invitados, 85 pases)
+// Extraccion definitiva y validada segun lista oficial de novios (50 invitados, 88 pases)
 export const GUESTS = [
   {
     "id": 1,
@@ -205,8 +205,8 @@ export const GUESTS = [
     "id": 26,
     "slug": "familia-guzman-moreno",
     "name": "Familia Guzman Moreno",
-    "passes": 4,
-    "reservaText": "Esta invitación está reservada para 4 personas",
+    "passes": 5,
+    "reservaText": "Esta invitación está reservada para 5 personas",
     "phone": "3176999226"
   },
   {
@@ -392,6 +392,14 @@ export const GUESTS = [
     "passes": 1,
     "reservaText": "Esta invitación está reservada para 1 persona",
     "phone": "3178688336"
+  },
+  {
+    "id": 50,
+    "slug": "julian-y-camila",
+    "name": "Julian y Camila",
+    "passes": 2,
+    "reservaText": "Esta invitación está reservada para 2 personas",
+    "phone": "3125304333"
   }
 ];
 

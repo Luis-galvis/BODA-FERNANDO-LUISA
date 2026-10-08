@@ -660,6 +660,37 @@
       box-shadow: 0 6px 18px rgba(44, 56, 33, 0.25);
     }
 
+    /* Estilos Módulo Envío Individual y Respaldo */
+    .individual-container {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    @media (max-width: 900px) {
+      .individual-container {
+        grid-template-columns: 1fr;
+      }
+    }
+    .badge-sent-yes {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+    .badge-sent-no {
+      background: #fff3e0;
+      color: #e65100;
+      border: 1px solid #ffcc80;
+      padding: 3px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
     /* Toast */
     .toast {
       position: fixed;
@@ -710,8 +741,8 @@
     <section class="metrics-grid">
       <div class="metric-card">
         <span class="metric-label">Invitaciones del Excel</span>
-        <span class="metric-value" id="kpiTotalCards">47</span>
-        <span class="metric-desc">Pases totales: <strong id="kpiTotalPasses">87</strong> personas</span>
+        <span class="metric-value" id="kpiTotalCards">50</span>
+        <span class="metric-desc">Pases totales: <strong id="kpiTotalPasses">88</strong> personas</span>
       </div>
 
       <div class="metric-card card-success">
@@ -722,8 +753,8 @@
 
       <div class="metric-card card-warning">
         <span class="metric-label">Por Confirmar</span>
-        <span class="metric-value" style="color: var(--color-warning);" id="kpiPending">47</span>
-        <span class="metric-desc" id="kpiPendingPasses">87 personas pendientes</span>
+        <span class="metric-value" style="color: var(--color-warning);" id="kpiPending">50</span>
+        <span class="metric-desc" id="kpiPendingPasses">88 personas pendientes</span>
       </div>
 
       <div class="metric-card card-danger">
@@ -743,11 +774,14 @@
     <nav class="admin-tabs">
       <button class="tab-btn active" onclick="switchTab('tab-guests')">
         <span>📋 Lista de Invitados</span>
-        <span class="tab-badge" id="tabBadgeGuests">47</span>
+        <span class="tab-badge" id="tabBadgeGuests">50</span>
       </button>
       <button class="tab-btn" onclick="switchTab('tab-rsvp')">
         <span>💌 Confirmaciones Online</span>
         <span class="tab-badge" id="tabBadgeRSVP">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('tab-individual')">
+        <span>📤 Envío Individual</span>
       </button>
       <button class="tab-btn" onclick="switchTab('tab-custom')">
         <span>✨ Generar Nuevo Enlace</span>
@@ -757,7 +791,7 @@
       </button>
     </nav>
 
-    <!-- PESTAÑA 1: LISTA DE LOS 47 INVITADOS CON ENVÍO WHATSAPP DIRECTO Y ESTADO -->
+    <!-- PESTAÑA 1: LISTA DE LOS 50 INVITADOS CON ENVÍO WHATSAPP DIRECTO Y ESTADO -->
     <section id="tab-guests" class="tab-content">
       <div class="search-filter-box">
         <div class="search-row">
@@ -775,7 +809,7 @@
 
         <div class="filter-pills-row">
           <span class="filter-group-title">Pases:</span>
-          <button class="pill-btn active" onclick="setPassFilter('all', this)">Todos (47)</button>
+          <button class="pill-btn active" onclick="setPassFilter('all', this)">Todos (50)</button>
           <button class="pill-btn" onclick="setPassFilter('1', this)">1 Pase</button>
           <button class="pill-btn" onclick="setPassFilter('2', this)">2 Pases</button>
           <button class="pill-btn" onclick="setPassFilter('multi', this)">3 a 5 Pases</button>
@@ -800,22 +834,177 @@
           <div>
             <h2 class="rsvp-online-title">Confirmaciones Recibidas desde la Tarjeta</h2>
             <p style="font-size: 0.8rem; color: var(--color-text-muted);">
-              Aquí aparecen las personas que han confirmado asistencia a través de su tarjeta digital.
+              Aquí aparecen las personas que han confirmado asistencia a través de su tarjeta digital o directamente con los novios.
             </p>
           </div>
-          <div style="display: flex; gap: 8px;">
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button class="rsvp-sync-btn" onclick="fetchCloudConfirmations()">
               🔄 Sincronizar en Vivo
+            </button>
+            <button class="btn-export" onclick="toggleManualRSVPPanel()" style="background: var(--color-gold-deep); color: #fff;">
+              ➕ Registrar Confirmación
             </button>
             <button class="btn-export" onclick="exportRSVPToCSV()">
               📥 Descargar Reporte (CSV)
             </button>
+            <button class="btn-export" onclick="exportBackupJSON()" title="Descargar copia de seguridad completa">
+              💾 Guardar Respaldo
+            </button>
+            <button class="btn-export" onclick="document.getElementById('importBackupInput').click()" title="Restaurar copia en este celular o computador">
+              📂 Cargar Respaldo
+            </button>
+            <input type="file" id="importBackupInput" accept=".json" style="display: none;" onchange="importBackupJSON(event)">
+          </div>
+        </div>
+
+        <!-- Panel Desplegable para Registrar Confirmación Manual / WhatsApp -->
+        <div id="manualRSVPPanel" style="display: none; background: #faf9f5; border: 1.5px dashed var(--color-gold-primary); border-radius: 12px; padding: 18px 20px; margin-bottom: 22px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--color-olive-dark);">
+              ➕ Registrar Confirmación de Invitado
+            </h3>
+            <span style="font-size: 0.72rem; color: var(--color-gold-deep); font-weight: 600;">Suma de inmediato a los números oficiales</span>
+          </div>
+          <p style="font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 14px;">
+            Si alguien confirmó por WhatsApp directamente a los novios o telefónicamente, regístralo aquí para que quede contabilizado de forma permanente:
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;">
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Invitado de la Lista:</label>
+              <select id="manualSelectGuest" class="form-input">
+                <!-- Llenado con GUESTS -->
+              </select>
+            </div>
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Respuesta de Asistencia:</label>
+              <select id="manualAttendance" class="form-input">
+                <option value="si">✅ Asistirá con alegría</option>
+                <option value="no">❌ No podrá asistir</option>
+              </select>
+            </div>
+            <div class="form-group" style="margin: 0;">
+              <label class="form-label">Mensaje o Nota (Opcional):</label>
+              <input type="text" id="manualMessage" class="form-input" placeholder="Ej: Confirmó por WhatsApp con alegría">
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" class="btn-action btn-copy" onclick="toggleManualRSVPPanel()">Cancelar</button>
+            <button type="button" class="btn-submit" style="width: auto; padding: 9px 24px;" onclick="saveManualRSVP()">💾 Guardar y Sincronizar</button>
           </div>
         </div>
 
         <div id="rsvpConfirmationsContainer" class="rsvp-confirmations-list">
           <!-- Renderizado dinámicamente con JS -->
         </div>
+      </div>
+    </section>
+
+    <!-- PESTAÑA: MÓDULO DE ENVÍO INDIVIDUAL DE TARJETAS -->
+    <section id="tab-individual" class="tab-content" style="display: none;">
+      <div class="individual-container">
+        
+        <!-- Ficha Interactiva de Envío -->
+        <div class="form-panel" style="max-width: 100%; margin: 0;">
+          <h2 style="font-family: var(--font-serif); font-size: 1.55rem; margin-bottom: 6px; color: var(--color-olive-dark);">
+            📤 Enviar Tarjeta Individual a un Invitado
+          </h2>
+          <p style="font-size: 0.8rem; color: var(--color-text-muted); margin-bottom: 18px; line-height: 1.45;">
+            Selecciona a cualquier invitado de los 50 para enviarle su invitación oficial por WhatsApp. Si su número telefónico cambió o tenía un error (como Jorge y Alejandra), puedes <strong>corregirlo aquí mismo</strong> antes de enviar.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label" style="font-weight: 700;">1. Seleccionar Invitado:</label>
+            <select class="form-input" id="indivGuestSelect" onchange="onSelectIndividualGuest(this.value)">
+              <!-- Llenado dinámicamente -->
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+            <div class="form-group">
+              <label class="form-label">Nombre del Invitado / Familia:</label>
+              <input type="text" class="form-input" id="indivGuestName" oninput="updateIndividualMessage()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Pases (Cupos):</label>
+              <input type="number" class="form-input" id="indivGuestPasses" min="1" max="10" oninput="updateIndividualMessage()">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="display: flex; justify-content: space-between; align-items: center;">
+              <span>📱 Celular WhatsApp de Destino:</span>
+              <span id="indivPhoneValidation" style="font-size: 0.72rem; color: var(--color-text-muted);"></span>
+            </label>
+            <div style="display: flex; gap: 8px;">
+              <span style="display: flex; align-items: center; padding: 0 12px; background: #eef2eb; border-radius: 8px; border: 1.5px solid #d4dbce; font-weight: 700; font-size: 0.85rem; color: var(--color-olive-dark);">+57</span>
+              <input type="tel" class="form-input" style="flex: 1;" id="indivGuestPhone" placeholder="Ej: 3101234567" oninput="updateIndividualMessage()">
+            </div>
+            <small style="font-size: 0.72rem; color: #777;">* Puedes escribir el número corregido de la persona aquí directamente.</small>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">🔗 Enlace Oficial a su Tarjeta Interactiva:</label>
+            <div style="display: flex; gap: 8px;">
+              <input type="text" readonly class="form-input" style="flex: 1; background: #f9faf8;" id="indivGuestLink">
+              <button type="button" class="btn-action btn-copy" style="padding: 0 14px; white-space: nowrap;" onclick="copyIndivLink()">🔗 Copiar</button>
+              <a href="#" target="_blank" id="indivPreviewLink" class="btn-action btn-preview" style="padding: 0 14px; white-space: nowrap;">👁️ Ver</a>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">💬 Mensaje Personalizado para WhatsApp:</label>
+            <textarea id="indivMessagePreview" class="form-input" rows="7" style="font-size: 0.78rem; line-height: 1.45; resize: vertical;"></textarea>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+            <a href="#" id="indivBtnSendWhatsApp" target="_blank" rel="noopener" class="btn-submit" style="background: #25d366; text-decoration: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.92rem; box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);">
+              💬 Abrir y Enviar por WhatsApp
+            </a>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+              <button type="button" class="btn-action btn-copy" style="padding: 10px; font-size: 0.78rem;" onclick="copyIndivMessage()">
+                📋 Copiar Mensaje Completo
+              </button>
+              <button type="button" class="btn-action btn-preview" id="indivBtnToggleSent" style="padding: 10px; font-size: 0.78rem;" onclick="toggleIndivSentStatus()">
+                ✓ Marcar como Enviado
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabla Rápida de Entrega de los 49 Invitados -->
+        <div class="form-panel" style="max-width: 100%; margin: 0; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px;">
+            <h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--color-olive-dark);">
+              📋 Estado de Envío (49 Invitados)
+            </h3>
+            <span id="indivSentCounterBadge" style="font-size: 0.75rem; background: var(--color-olive-wash); padding: 4px 10px; border-radius: 12px; font-weight: 700; color: var(--color-olive-dark);">
+              0 / 49 Enviados
+            </span>
+          </div>
+
+          <div style="margin-bottom: 10px;">
+            <input type="text" id="indivListSearch" class="form-input" placeholder="Buscar por nombre o celular..." oninput="renderIndivTable()" style="padding: 7px 12px; font-size: 0.8rem;">
+          </div>
+
+          <div style="flex: 1; max-height: 520px; overflow-y: auto; border: 1px solid #e2e8dc; border-radius: 8px;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.76rem;">
+              <thead style="background: var(--color-olive-dark); color: #fff; position: sticky; top: 0; z-index: 5;">
+                <tr>
+                  <th style="padding: 8px 10px; text-align: left;">Invitado</th>
+                  <th style="padding: 8px 6px; text-align: center;">Pases</th>
+                  <th style="padding: 8px 8px; text-align: left;">Celular</th>
+                  <th style="padding: 8px 6px; text-align: center;">Entrega</th>
+                  <th style="padding: 8px 10px; text-align: right;">Acción</th>
+                </tr>
+              </thead>
+              <tbody id="indivTableBody">
+                <!-- Llenado dinámico -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -930,7 +1119,9 @@
     let currentPassFilter = 'all';
     let currentStatusFilter = 'all';
     let guestStatuses = {};
+    let sentStatuses = {};
     let cloudConfirmations = [];
+    let currentIndivGuestId = null;
 
     // Cargar estados guardados de los invitados (confirmado, pendiente, declinado)
     function loadGuestStatuses() {
@@ -953,17 +1144,39 @@
       updateKPICounters();
     }
 
+    // Cargar historial de tarjetas enviadas
+    function loadSentStatuses() {
+      try {
+        const saved = localStorage.getItem('wedding_sent_status');
+        if (saved) {
+          sentStatuses = JSON.parse(saved);
+        }
+      } catch (e) {
+        sentStatuses = {};
+      }
+    }
+
+    function saveSentStatuses() {
+      try {
+        localStorage.setItem('wedding_sent_status', JSON.stringify(sentStatuses));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     window.switchTab = function(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
 
-      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+      const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes(tabId));
       if (activeBtn) activeBtn.classList.add('active');
       const content = document.getElementById(tabId);
       if (content) content.style.display = 'block';
 
       if (tabId === 'tab-rsvp') {
         fetchCloudConfirmations();
+      } else if (tabId === 'tab-individual') {
+        renderIndivTable();
       }
     };
 
@@ -1023,8 +1236,10 @@
       const kpiPendingPasses = document.getElementById('kpiPendingPasses');
       const kpiDeclined = document.getElementById('kpiDeclined');
       const kpiDeclinedPasses = document.getElementById('kpiDeclinedPasses');
+      const tabBadgeGuests = document.getElementById('tabBadgeGuests');
 
       if (kpiTotalCards) kpiTotalCards.textContent = GUESTS.length;
+      if (tabBadgeGuests) tabBadgeGuests.textContent = GUESTS.length;
       if (kpiTotalPasses) kpiTotalPasses.textContent = totalPasses;
       if (kpiConfirmed) kpiConfirmed.textContent = confirmedGuests;
       if (kpiConfirmedPasses) kpiConfirmedPasses.textContent = `${confirmedPasses} personas confirmadas`;
@@ -1072,7 +1287,6 @@
         const cardLink = `${baseUrl}?invitado=${g.slug}`;
         const cleanPhone = g.phone ? g.phone.replace(/\D/g, '') : '';
         const intlPhone = cleanPhone ? (cleanPhone.startsWith('57') ? cleanPhone : `57${cleanPhone}`) : '';
-        const plural = g.passes > 1 ? 's' : '';
         const currentSt = guestStatuses[g.id] || 'pending';
 
         const passesText = g.passes > 1 ? `(tu invitación está reservada para *${g.passes} personas*)` : `(tu invitación está reservada para *1 persona*)`;
@@ -1125,7 +1339,7 @@
     };
 
     // =========================================================================
-    // CONFIRMACIONES ONLINE (RSVP EN TIEMPO REAL DESDE NTFY.SH + LOCAL)
+    // CONFIRMACIONES ONLINE (RSVP EN TIEMPO REAL DESDE NTFY.SH + LOCAL PERSISTENTE)
     // =========================================================================
     window.fetchCloudConfirmations = function() {
       const container = document.getElementById('rsvpConfirmationsContainer');
@@ -1134,7 +1348,7 @@
         container.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);">Sincronizando confirmaciones en línea...</div>`;
       }
 
-      // 1. Obtener de localStorage primero
+      // 1. Obtener de localStorage primero (persistencia permanente)
       let localList = [];
       try {
         localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
@@ -1156,25 +1370,48 @@
                 const parsed = JSON.parse(data.message);
                 cloudList.push(parsed);
               }
-            } catch (err) {
-              // si el mensaje es texto plano
-            }
+            } catch (err) {}
           });
 
           // Combinar y eliminar duplicados por nombre y fecha
           const combined = [...localList];
           cloudList.forEach(c => {
-            const exists = combined.some(x => x.name === c.name && Math.abs(new Date(x.date || 0) - new Date(c.date || 0)) < 10000);
+            const exists = combined.some(x => 
+              x.name && c.name && 
+              x.name.toLowerCase().trim() === c.name.toLowerCase().trim() && 
+              (Math.abs(new Date(x.date || 0) - new Date(c.date || 0)) < 60000 || !x.date)
+            );
             if (!exists) combined.push(c);
           });
 
-          cloudConfirmations = combined.reverse(); // más recientes primero
+          // Guardar de inmediato en localStorage para que NUNCA se pierdan a las 12 horas
+          try {
+            localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(combined));
+          } catch (e) {
+            console.error(e);
+          }
+
+          // Auto-sincronizar estados en la lista oficial
+          combined.forEach(c => {
+            const isYes = c.attendance === 'si';
+            const matched = GUESTS.find(g => 
+              (g.name && c.name && g.name.toLowerCase().trim() === c.name.toLowerCase().trim()) ||
+              (g.name && c.name && g.name.toLowerCase().includes(c.name.toLowerCase())) ||
+              (c.name && g.name && c.name.toLowerCase().includes(g.name.toLowerCase()))
+            );
+            if (matched && (!guestStatuses[matched.id] || guestStatuses[matched.id] === 'pending')) {
+              guestStatuses[matched.id] = isYes ? 'confirmed' : 'declined';
+            }
+          });
+          saveGuestStatuses();
+
+          cloudConfirmations = combined.slice().reverse(); // más recientes primero
           renderConfirmationsList();
           if (badge) badge.textContent = cloudConfirmations.length;
         })
         .catch(err => {
           console.warn('Error fetching cloud confirmations:', err);
-          cloudConfirmations = localList.reverse();
+          cloudConfirmations = localList.slice().reverse();
           renderConfirmationsList();
           if (badge) badge.textContent = cloudConfirmations.length;
         });
@@ -1190,7 +1427,7 @@
         container.innerHTML = `
           <div style="text-align: center; padding: 40px; color: var(--color-text-muted); background: #fafbfa; border-radius: 10px; border: 1px dashed #dce2d7;">
             <p style="font-size: 1.1rem; margin-bottom: 6px;">Aún no hay confirmaciones registradas en línea.</p>
-            <p style="font-size: 0.8rem;">Cuando un invitado complete el formulario "¿Nos Acompañas?" en su tarjeta, aparecerá aquí inmediatamente.</p>
+            <p style="font-size: 0.8rem;">Cuando un invitado confirme en su tarjeta o registres su confirmación manualmente con el botón de arriba, aparecerá aquí inmediatamente.</p>
           </div>
         `;
         return;
@@ -1203,8 +1440,12 @@
         const isYes = item.attendance === 'si';
         const formattedDate = item.date ? new Date(item.date).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : 'Reciente';
 
-        // Intentar encontrar coincidencia en la lista de los 47 invitados
-        const matchedGuest = GUESTS.find(g => g.name.toLowerCase().includes(item.name.toLowerCase()) || item.name.toLowerCase().includes(g.name.toLowerCase()));
+        // Buscar coincidencia en la lista oficial
+        const matchedGuest = GUESTS.find(g => 
+          (g.name && item.name && g.name.toLowerCase().trim() === item.name.toLowerCase().trim()) ||
+          (g.name && item.name && g.name.toLowerCase().includes(item.name.toLowerCase())) ||
+          (item.name && g.name && item.name.toLowerCase().includes(g.name.toLowerCase()))
+        );
 
         div.innerHTML = `
           <div class="rsvp-item-left">
@@ -1223,6 +1464,10 @@
                 ✓ Sincronizar en Lista (${matchedGuest.name})
               </button>
             ` : ''}
+
+            <button class="btn-action" style="padding: 6px 10px; font-size: 0.72rem; background: #fff0f0; color: #c62828; border: 1px solid #ffcdd2;" onclick="deleteRSVPItem(${index})" title="Eliminar registro">
+              🗑️
+            </button>
           </div>
         `;
 
@@ -1237,18 +1482,360 @@
       showAdminToast('✓ Invitado sincronizado en la lista oficial');
     };
 
+    window.toggleManualRSVPPanel = function() {
+      const panel = document.getElementById('manualRSVPPanel');
+      if (panel) {
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      }
+    };
+
+    function initManualRSVPSelect() {
+      const select = document.getElementById('manualSelectGuest');
+      if (!select) return;
+      select.innerHTML = '';
+      GUESTS.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g.id;
+        opt.textContent = `${g.name} (${g.passes} ${g.passes === 1 ? 'pase' : 'pases'})`;
+        select.appendChild(opt);
+      });
+    }
+
+    window.saveManualRSVP = function() {
+      const select = document.getElementById('manualSelectGuest');
+      const attSelect = document.getElementById('manualAttendance');
+      const msgInput = document.getElementById('manualMessage');
+
+      const guestId = parseInt(select.value, 10);
+      const guest = GUESTS.find(g => g.id === guestId);
+      if (!guest) return;
+
+      const attendance = attSelect.value;
+      const isYes = attendance === 'si';
+      const statusText = isYes ? '¡Sí, asistiré con mucha alegría!' : 'Lamentablemente no podré asistir';
+      const message = (msgInput.value || '').trim();
+
+      const newRecord = {
+        name: guest.name,
+        attendance: attendance,
+        statusText: statusText,
+        message: message,
+        date: new Date().toISOString()
+      };
+
+      // Guardar en la lista permanente
+      let list = [];
+      try {
+        list = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
+      } catch (e) { list = []; }
+
+      list.push(newRecord);
+      localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(list));
+
+      // Actualizar estado del invitado
+      guestStatuses[guest.id] = isYes ? 'confirmed' : 'declined';
+      saveGuestStatuses();
+
+      // Recargar confirmaciones
+      cloudConfirmations = list.slice().reverse();
+      renderConfirmationsList();
+      const badge = document.getElementById('tabBadgeRSVP');
+      if (badge) badge.textContent = cloudConfirmations.length;
+
+      // Limpiar y ocultar panel
+      msgInput.value = '';
+      document.getElementById('manualRSVPPanel').style.display = 'none';
+      showAdminToast(`✓ Confirmación de ${guest.name} guardada exitosamente`);
+      renderGuests();
+    };
+
+    window.deleteRSVPItem = function(index) {
+      if (!confirm('¿Deseas eliminar este registro de confirmación?')) return;
+      let list = [];
+      try {
+        list = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
+      } catch (e) { list = []; }
+
+      const actualIndex = list.length - 1 - index;
+      if (actualIndex >= 0 && actualIndex < list.length) {
+        list.splice(actualIndex, 1);
+        localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(list));
+        cloudConfirmations = list.slice().reverse();
+        renderConfirmationsList();
+        const badge = document.getElementById('tabBadgeRSVP');
+        if (badge) badge.textContent = cloudConfirmations.length;
+        showAdminToast('Registro eliminado');
+      }
+    };
+
+    // =========================================================================
+    // RESPALDO Y RESTAURACIÓN JSON (ENTRE DISPOSITIVOS)
+    // =========================================================================
+    window.exportBackupJSON = function() {
+      const backupData = {
+        wedding_guest_rsvp_statuses: guestStatuses,
+        wedding_rsvp_confirmations: JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]'),
+        wedding_sent_status: sentStatuses,
+        exportedAt: new Date().toISOString()
+      };
+      const jsonStr = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `respaldo_confirmaciones_boda_${new Date().toISOString().slice(0,10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      showAdminToast('💾 Copia de seguridad descargada exitosamente');
+    };
+
+    window.importBackupJSON = function(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.wedding_guest_rsvp_statuses) {
+            guestStatuses = { ...guestStatuses, ...data.wedding_guest_rsvp_statuses };
+            saveGuestStatuses();
+          }
+          if (data.wedding_sent_status) {
+            sentStatuses = { ...sentStatuses, ...data.wedding_sent_status };
+            saveSentStatuses();
+          }
+          if (data.wedding_rsvp_confirmations) {
+            let localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
+            const combined = [...localList];
+            data.wedding_rsvp_confirmations.forEach(c => {
+              const exists = combined.some(x => x.name === c.name && x.date === c.date);
+              if (!exists) combined.push(c);
+            });
+            localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(combined));
+            cloudConfirmations = combined.slice().reverse();
+            renderConfirmationsList();
+            const badge = document.getElementById('tabBadgeRSVP');
+            if (badge) badge.textContent = cloudConfirmations.length;
+          }
+          renderGuests();
+          renderIndivTable();
+          showAdminToast('📂 ¡Respaldo restaurado correctamente!');
+        } catch (err) {
+          alert('Error al leer el archivo de respaldo: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = '';
+    };
+
+    // =========================================================================
+    // MÓDULO DE ENVÍO INDIVIDUAL DE INVITACIONES
+    // =========================================================================
+    function initIndividualSender() {
+      const select = document.getElementById('indivGuestSelect');
+      if (!select) return;
+
+      select.innerHTML = '';
+      GUESTS.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g.id;
+        const sentBadge = sentStatuses[g.id] ? ' [✅ Enviado]' : '';
+        opt.textContent = `${g.name} (${g.passes} ${g.passes === 1 ? 'pase' : 'pases'})${sentBadge}`;
+        select.appendChild(opt);
+      });
+
+      // Seleccionar el primero o el guardado
+      const firstId = currentIndivGuestId || GUESTS[0].id;
+      loadIndividualGuest(firstId);
+    }
+
+    window.loadIndividualGuest = function(guestId) {
+      const guest = GUESTS.find(g => g.id === parseInt(guestId, 10));
+      if (!guest) return;
+
+      currentIndivGuestId = guest.id;
+      const select = document.getElementById('indivGuestSelect');
+      if (select) select.value = guest.id;
+
+      document.getElementById('indivGuestName').value = guest.name;
+      document.getElementById('indivGuestPasses').value = guest.passes || 1;
+      
+      const cleanDigits = guest.phone ? guest.phone.replace(/\D/g, '') : '';
+      const localPhone = cleanDigits.startsWith('57') ? cleanDigits.slice(2) : cleanDigits;
+      document.getElementById('indivGuestPhone').value = localPhone;
+
+      const baseUrl = window.location.origin + window.location.pathname.replace('novios.html', 'index.html');
+      const cardLink = `${baseUrl}?invitado=${guest.slug}`;
+      document.getElementById('indivGuestLink').value = cardLink;
+      document.getElementById('indivPreviewLink').href = cardLink;
+
+      updateIndividualMessage();
+      updateIndivSentButton();
+    };
+
+    window.onSelectIndividualGuest = function(val) {
+      loadIndividualGuest(parseInt(val, 10));
+    };
+
+    window.updateIndividualMessage = function() {
+      const name = (document.getElementById('indivGuestName').value || '').trim() || 'Apreciado Invitado';
+      const passes = parseInt(document.getElementById('indivGuestPasses').value, 10) || 1;
+      const rawPhone = (document.getElementById('indivGuestPhone').value || '').trim();
+      const cardLink = document.getElementById('indivGuestLink').value;
+
+      const clean = rawPhone.replace(/\D/g, '');
+      const intlPhone = clean ? (clean.startsWith('57') ? clean : `57${clean}`) : '';
+
+      const passesText = passes > 1 
+        ? `(tu invitación está reservada para *${passes} personas*)` 
+        : `(tu invitación está reservada para *1 persona*)`;
+
+      const msg = `¡Hola *${name}*!\n\n` +
+        `Estamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n` +
+        `¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial.\n\n` +
+        `Puedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n` +
+        `${cardLink}\n\n` +
+        `Con todo nuestro cariño,\n` +
+        `— *Fernando & Luisa Fernanda*`;
+
+      document.getElementById('indivMessagePreview').value = msg;
+
+      const waBtn = document.getElementById('indivBtnSendWhatsApp');
+      if (intlPhone) {
+        waBtn.href = `https://wa.me/${intlPhone}?text=${encodeURIComponent(msg)}`;
+        document.getElementById('indivPhoneValidation').textContent = `Destino: +${intlPhone}`;
+        document.getElementById('indivPhoneValidation').style.color = 'var(--color-success)';
+      } else {
+        waBtn.href = `https://wa.me/?text=${encodeURIComponent(msg)}`;
+        document.getElementById('indivPhoneValidation').textContent = '⚠️ Sin número de WhatsApp (abrirá chat general)';
+        document.getElementById('indivPhoneValidation').style.color = 'var(--color-warning)';
+      }
+    };
+
+    window.copyIndivLink = function() {
+      const url = document.getElementById('indivGuestLink').value;
+      navigator.clipboard.writeText(url).then(() => {
+        showAdminToast('¡Enlace interactivo copiado!');
+      });
+    };
+
+    window.copyIndivMessage = function() {
+      const msg = document.getElementById('indivMessagePreview').value;
+      navigator.clipboard.writeText(msg).then(() => {
+        showAdminToast('¡Mensaje formal copiado para WhatsApp!');
+      });
+    };
+
+    function updateIndivSentButton() {
+      const btn = document.getElementById('indivBtnToggleSent');
+      if (!btn || !currentIndivGuestId) return;
+
+      const isSent = !!sentStatuses[currentIndivGuestId];
+      if (isSent) {
+        btn.textContent = '✅ Marcado como Enviado';
+        btn.style.background = '#e8f5e9';
+        btn.style.color = '#2e7d32';
+      } else {
+        btn.textContent = '⏳ Marcar como Enviado';
+        btn.style.background = 'var(--color-olive-wash)';
+        btn.style.color = 'var(--color-olive-dark)';
+      }
+    }
+
+    window.toggleIndivSentStatus = function() {
+      if (!currentIndivGuestId) return;
+      sentStatuses[currentIndivGuestId] = !sentStatuses[currentIndivGuestId];
+      saveSentStatuses();
+      updateIndivSentButton();
+      renderIndivTable();
+      initIndividualSender(); // refrescar etiquetas en dropdown
+      showAdminToast(sentStatuses[currentIndivGuestId] ? '✓ Marcado como entregado' : 'Marcado como pendiente');
+    };
+
+    window.renderIndivTable = function() {
+      const tbody = document.getElementById('indivTableBody');
+      const counterBadge = document.getElementById('indivSentCounterBadge');
+      if (!tbody) return;
+
+      const search = (document.getElementById('indivListSearch')?.value || '').toLowerCase().trim();
+
+      let sentCount = 0;
+      GUESTS.forEach(g => { if (sentStatuses[g.id]) sentCount++; });
+      if (counterBadge) counterBadge.textContent = `${sentCount} / ${GUESTS.length} Entregados`;
+
+      const filtered = GUESTS.filter(g => {
+        return g.name.toLowerCase().includes(search) || (g.phone && g.phone.includes(search));
+      });
+
+      tbody.innerHTML = '';
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 20px; color: #888;">No se encontraron resultados</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(g => {
+        const isSent = !!sentStatuses[g.id];
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #edf1ea';
+        tr.style.background = currentIndivGuestId === g.id ? '#f5f7f2' : 'transparent';
+
+        tr.innerHTML = `
+          <td style="padding: 9px 10px; font-weight: 600; color: var(--color-olive-dark);">
+            ${g.name}
+          </td>
+          <td style="padding: 9px 6px; text-align: center;">
+            <span class="badge-passes" style="font-size: 0.65rem; padding: 2px 7px;">${g.passes}</span>
+          </td>
+          <td style="padding: 9px 8px; font-family: monospace; font-size: 0.72rem; color: #555;">
+            ${g.phone ? '+57 ' + g.phone : '<span style="color:#bbb;">Sin número</span>'}
+          </td>
+          <td style="padding: 9px 6px; text-align: center;">
+            <span class="${isSent ? 'badge-sent-yes' : 'badge-sent-no'}" style="cursor: pointer;" onclick="toggleSentFromTable(${g.id})">
+              ${isSent ? '✅ Enviado' : '⏳ Pendiente'}
+            </span>
+          </td>
+          <td style="padding: 9px 10px; text-align: right;">
+            <button class="btn-action btn-preview" style="padding: 4px 8px; font-size: 0.7rem; display: inline-flex;" onclick="quickSelectIndivGuest(${g.id})">
+              Editar / Enviar 💬
+            </button>
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    };
+
+    window.toggleSentFromTable = function(guestId) {
+      sentStatuses[guestId] = !sentStatuses[guestId];
+      saveSentStatuses();
+      renderIndivTable();
+      if (currentIndivGuestId === guestId) updateIndivSentButton();
+      initIndividualSender();
+      showAdminToast('Estado de envío actualizado');
+    };
+
+    window.quickSelectIndivGuest = function(guestId) {
+      loadIndividualGuest(guestId);
+      renderIndivTable();
+      // Scroll suave hacia la ficha de envío
+      document.getElementById('tab-individual').scrollIntoView({ behavior: 'smooth' });
+    };
+
     // =========================================================================
     // EXPORTACIÓN A EXCEL / CSV
     // =========================================================================
     window.exportGuestsToCSV = function() {
-      let csv = 'ID,Nombre Invitado,Pases Reservados,Telefono,Estado Confirmacion,Enlace Tarjeta\n';
+      let csv = 'ID,Nombre Invitado,Pases Reservados,Telefono,Estado Confirmacion,Estado Envio,Enlace Tarjeta\n';
       const baseUrl = window.location.origin + window.location.pathname.replace('novios.html', 'index.html');
 
       GUESTS.forEach(g => {
         const st = guestStatuses[g.id] || 'pending';
         const stText = st === 'confirmed' ? 'Confirmado' : st === 'declined' ? 'No Asiste' : 'Pendiente';
+        const sentText = sentStatuses[g.id] ? 'Enviado' : 'Pendiente';
         const link = `${baseUrl}?invitado=${g.slug}`;
-        csv += `"${g.id}","${g.name.replace(/"/g, '""')}","${g.passes}","${g.phone || ''}","${stText}","${link}"\n`;
+        csv += `"${g.id}","${g.name.replace(/"/g, '""')}","${g.passes}","${g.phone || ''}","${stText}","${sentText}","${link}"\n`;
       });
 
       downloadCSV(csv, 'lista_invitados_boda_edgar_y_luisa.csv');
@@ -1376,8 +1963,11 @@
 
     // Inicialización
     loadGuestStatuses();
+    loadSentStatuses();
     updateKPICounters();
     renderGuests();
+    initIndividualSender();
+    initManualRSVPSelect();
     fetchCloudConfirmations();
   </script>
 </body>

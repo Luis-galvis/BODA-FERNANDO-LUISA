@@ -406,6 +406,89 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
+  // Endpoint: Verificar si un número tiene WhatsApp activo
+  if (url.pathname === '/api/check-phone') {
+    const rawPhone = url.searchParams.get('phone') || '';
+    const jid = formatJid(rawPhone);
+    if (!jid) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'Número de teléfono inválido' }));
+    }
+    if (BotState.status !== 'connected' || !BotState.sock) {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'WhatsApp no está conectado en el bot' }));
+    }
+    try {
+      const result = await BotState.sock.onWhatsApp(jid);
+      const isRegistered = Array.isArray(result) && result.length > 0 && !!result[0]?.exists;
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ phone: rawPhone, jid, exists: isRegistered }));
+    } catch (err) {
+      res.writeHead(500, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: err.message }));
+    }
+  }
+
+  // Endpoint: Envío individual de PDF oficial a un invitado
+  if (url.pathname === '/api/send-individual' && req.method === 'POST') {
+    if (BotState.status !== 'connected') {
+      res.writeHead(400, { 'Content-Type': 'application/json' });
+      return res.end(JSON.stringify({ error: 'WhatsApp no está conectado todavía. Por favor escanea el código QR.' }));
+    }
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', async () => {
+      try {
+        const data = JSON.parse(body);
+        const guestId = parseInt(data.guestId, 10);
+        const guestObj = GUESTS.find(g => g.id === guestId) || {};
+
+        const targetPhone = (data.phone || guestObj.phone || '').toString().trim();
+        const jid = formatJid(targetPhone);
+        if (!jid) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          return res.end(JSON.stringify({ error: 'Número de teléfono inválido' }));
+        }
+
+        // 1. Verificación previa con WhatsApp para evitar enviar a números inexistentes
+        try {
+          const check = await BotState.sock.onWhatsApp(jid);
+          const isRegistered = Array.isArray(check) && check.length > 0 && !!check[0]?.exists;
+          if (!isRegistered) {
+            addLog(`⚠️ El número +${targetPhone} NO está registrado en WhatsApp. Envío cancelado.`);
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            return res.end(JSON.stringify({ 
+              error: `El número +${targetPhone} NO tiene cuenta de WhatsApp registrada. Por favor verifica o corrige el número.` 
+            }));
+          }
+        } catch (_) {}
+
+        const guestName = data.name || guestObj.name || 'Apreciado Invitado';
+        const passes = parseInt(data.passes || guestObj.passes || 1, 10);
+        let slug = data.slug || guestObj.slug || slugify(guestName);
+
+        const guestToSend = { name: guestName, passes: passes, slug: slug };
+        const message = buildMessage(guestName, passes);
+
+        addLog(`📤 [Envío Individual] Enviando PDF oficial a ${guestName} (+${jid.replace('@s.whatsapp.net', '')})...`);
+        await sendMessageToJid(jid, guestToSend, message);
+
+        if (guestId) {
+          saveEnviado(guestId, guestName, targetPhone);
+        }
+        addLog(`✅ ¡Invitación en PDF entregada con éxito a ${guestName}!`);
+
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ success: true, message: `Invitación en PDF enviada exitosamente a ${guestName}` }));
+      } catch (err) {
+        addLog(`❌ Error en envío individual: ${err.message}`);
+        res.writeHead(500, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ error: err.message }));
+      }
+    });
+    return;
+  }
+
   // Endpoint: Iniciar masivo
   if (url.pathname === '/api/start-bulk' && req.method === 'POST') {
     if (BotState.status !== 'connected') {
@@ -626,11 +709,11 @@ function renderHtml() {
 
     <!-- Tarjeta 3: Envío Masivo a Todos los Invitados -->
     <div class="card">
-      <div class="card-title">🚀 3. Envío Masivo en PDF a los 53 Invitados</div>
+      <div class="card-title">🚀 3. Envío Masivo en PDF a los Invitados Pendientes</div>
       
       <div class="stats-row">
         <div class="stat-box">
-          <div class="stat-num" id="statTotal">53</div>
+          <div class="stat-num" id="statTotal">49</div>
           <div class="stat-label">Total Invitados</div>
         </div>
         <div class="stat-box">
@@ -664,7 +747,66 @@ function renderHtml() {
       </div>
     </div>
 
-    <!-- Tarjeta 4: Registro en Vivo -->
+    <!-- Tarjeta 4: Envío Individual de Invitación en PDF -->
+    <div class="card">
+      <div class="card-title">📤 4. Envío Individual de PDF a Invitado Específico</div>
+      <p style="font-size: 0.82rem; color: #555; margin-bottom: 14px;">
+        Si a un invitado no le llegó o su número cambió, puedes enviarle su invitación oficial en PDF de manera individual aquí. Incluye verificación previa con WhatsApp para evitar fallas.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px;">
+        <div class="form-group">
+          <label>1. Seleccionar Invitado:</label>
+          <select id="botIndivGuestSelect" onchange="onBotSelectIndivGuest(this.value)">
+            <!-- Poblado con JS -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>2. Número Celular Destino:</label>
+          <div style="display: flex; gap: 8px;">
+            <input type="text" id="botIndivPhone" placeholder="Ej: 3101234567">
+            <button class="btn btn-gold" style="width: auto; padding: 0 14px; font-size: 0.78rem; white-space: nowrap;" onclick="verifyWhatsAppNumber()">
+              🔍 Verificar WhatsApp
+            </button>
+          </div>
+          <div id="botPhoneCheckStatus" style="font-size: 0.75rem; margin-top: 4px; font-weight: 600;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+        <button class="btn btn-primary" id="btnSendIndivBot" onclick="sendIndividualFromBot()" style="font-size: 0.9rem;">
+          📄 Enviar Invitación Oficial en PDF a este Invitado
+        </button>
+      </div>
+
+      <!-- Tabla de los 49 Invitados -->
+      <div style="border-top: 1px solid var(--border); padding-top: 14px; margin-top: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+          <strong style="font-size: 0.88rem; color: var(--olive-dark);">Lista Oficial de Invitados:</strong>
+          <input type="text" id="botTableSearch" placeholder="Buscar por nombre..." oninput="renderBotGuestsTable()" style="width: 220px; padding: 6px 10px; font-size: 0.8rem;">
+        </div>
+        <div style="max-height: 320px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px;">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.76rem;">
+            <thead style="background: var(--olive-dark); color: #fff; position: sticky; top: 0;">
+              <tr>
+                <th style="padding: 7px 10px; text-align: left;">ID</th>
+                <th style="padding: 7px 10px; text-align: left;">Nombre</th>
+                <th style="padding: 7px 6px; text-align: center;">Pases</th>
+                <th style="padding: 7px 8px; text-align: left;">Celular</th>
+                <th style="padding: 7px 6px; text-align: center;">Estado</th>
+                <th style="padding: 7px 10px; text-align: right;">Acción</th>
+              </tr>
+            </thead>
+            <tbody id="botGuestsTableBody">
+              <!-- Renderizado con JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta 5: Registro de Actividad en Vivo -->
     <div class="card">
       <div class="card-title">📋 Registro de Actividad en Vivo</div>
       <div class="terminal-box" id="terminalLogs">
@@ -826,8 +968,159 @@ function renderHtml() {
       updateStatus();
     }
 
+    // Funciones del Módulo de Envío Individual
+    let botGuestsList = [];
+
+    async function loadBotGuests() {
+      try {
+        const res = await fetch('/api/guests');
+        botGuestsList = await res.json();
+        
+        const select = document.getElementById('botIndivGuestSelect');
+        if (select) {
+          select.innerHTML = '';
+          botGuestsList.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g.id;
+            const sentBadge = g.sent ? ' [✅ Ya enviado]' : '';
+            opt.textContent = g.name + ' (' + g.passes + (g.passes === 1 ? ' pase' : ' pases') + ')' + sentBadge;
+            select.appendChild(opt);
+          });
+          if (botGuestsList.length > 0) {
+            onBotSelectIndivGuest(botGuestsList[0].id);
+          }
+        }
+        renderBotGuestsTable();
+      } catch (e) {
+        console.warn('Error cargando invitados en bot:', e);
+      }
+    }
+
+    function onBotSelectIndivGuest(guestId) {
+      const guest = botGuestsList.find(g => g.id === parseInt(guestId, 10));
+      if (!guest) return;
+      document.getElementById('botIndivPhone').value = guest.phone || '';
+      document.getElementById('botPhoneCheckStatus').textContent = '';
+    }
+
+    async function verifyWhatsAppNumber() {
+      const phone = document.getElementById('botIndivPhone').value.trim();
+      const statusEl = document.getElementById('botPhoneCheckStatus');
+      if (!phone) {
+        statusEl.textContent = '⚠️ Ingresa un número para verificar';
+        statusEl.style.color = '#c62828';
+        return;
+      }
+      statusEl.textContent = 'Verificando con WhatsApp...';
+      statusEl.style.color = '#555';
+      try {
+        const res = await fetch('/api/check-phone?phone=' + encodeURIComponent(phone));
+        const data = await res.json();
+        if (data.exists) {
+          statusEl.textContent = '✅ Número registrado y activo en WhatsApp';
+          statusEl.style.color = '#2e7d32';
+        } else {
+          statusEl.textContent = '❌ Número NO registrado en WhatsApp (revisa si tiene un error)';
+          statusEl.style.color = '#c62828';
+        }
+      } catch (err) {
+        statusEl.textContent = 'Error verificando: ' + err.message;
+        statusEl.style.color = '#c62828';
+      }
+    }
+
+    async function sendIndividualFromBot() {
+      const select = document.getElementById('botIndivGuestSelect');
+      const phoneInput = document.getElementById('botIndivPhone');
+      const btn = document.getElementById('btnSendIndivBot');
+
+      const guestId = parseInt(select.value, 10);
+      const guest = botGuestsList.find(g => g.id === guestId);
+      if (!guest) return;
+
+      const targetPhone = phoneInput.value.trim();
+      if (!targetPhone) {
+        alert('Ingresa el número de celular de destino.');
+        return;
+      }
+
+      if (!confirm('¿Deseas enviar la Invitación Oficial en PDF a ' + guest.name + ' al número +57 ' + targetPhone + '?')) return;
+
+      btn.disabled = true;
+      btn.textContent = '⏳ Enviando PDF oficial vía WhatsApp...';
+
+      try {
+        const res = await fetch('/api/send-individual', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            guestId: guest.id,
+            name: guest.name,
+            phone: targetPhone,
+            passes: guest.passes,
+            slug: guest.slug
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('✅ ¡Invitación en PDF entregada con éxito a ' + guest.name + '!');
+          loadBotGuests();
+          updateStatus();
+        } else {
+          alert('❌ Error: ' + (data.error || 'No se pudo enviar'));
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '📄 Enviar Invitación Oficial en PDF a este Invitado';
+      }
+    }
+
+    function renderBotGuestsTable() {
+      const tbody = document.getElementById('botGuestsTableBody');
+      if (!tbody) return;
+      const search = (document.getElementById('botTableSearch')?.value || '').toLowerCase().trim();
+
+      const filtered = botGuestsList.filter(g => {
+        return g.name.toLowerCase().includes(search) || (g.phone && g.phone.includes(search));
+      });
+
+      tbody.innerHTML = '';
+      filtered.forEach(g => {
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid var(--border)';
+        tr.innerHTML = 
+          '<td style="padding: 7px 10px; color: #777;">' + g.id + '</td>' +
+          '<td style="padding: 7px 10px; font-weight: 600;">' + g.name + '</td>' +
+          '<td style="padding: 7px 6px; text-align: center;">' + g.passes + '</td>' +
+          '<td style="padding: 7px 8px; font-family: monospace;">' + (g.phone ? '+57 ' + g.phone : '<span style="color:#aaa;">--</span>') + '</td>' +
+          '<td style="padding: 7px 6px; text-align: center;">' +
+            '<span class="badge ' + (g.sent ? 'badge-green' : 'badge-yellow') + '" style="font-size: 0.65rem; padding: 2px 8px;">' +
+              (g.sent ? 'Enviado' : 'Pendiente') +
+            '</span>' +
+          '</td>' +
+          '<td style="padding: 7px 10px; text-align: right;">' +
+            '<button class="btn btn-gold" style="width: auto; padding: 3px 8px; font-size: 0.68rem; display: inline-flex;" onclick="quickBotSelect(' + g.id + ')">' +
+              'Enviar PDF 📄' +
+            '</button>' +
+          '</td>';
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.quickBotSelect = function(id) {
+      const select = document.getElementById('botIndivGuestSelect');
+      if (select) {
+        select.value = id;
+        onBotSelectIndivGuest(id);
+      }
+      document.getElementById('btnSendIndivBot').scrollIntoView({ behavior: 'smooth' });
+    };
+
     setInterval(updateStatus, 2000);
     updateStatus();
+    loadBotGuests();
   </script>
 </body>
 </html>`;
