@@ -762,11 +762,10 @@ window.handleRSVPSubmit = function(event) {
       }]).then(() => {});
 
       if (AppState.currentGuest && AppState.currentGuest.id) {
-        sbClient.from('wedding_guests').upsert([{
-          id: AppState.currentGuest.id,
+        sbClient.from('wedding_guests').update({
           status: attendance === 'si' ? 'confirmed' : 'declined',
           updated_at: new Date().toISOString()
-        }]).then(() => {});
+        }).eq('id', AppState.currentGuest.id).then(() => {});
       }
     }
   } catch(err) {

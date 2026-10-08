@@ -779,10 +779,6 @@
         <span>📋 Lista de Invitados</span>
         <span class="tab-badge" id="tabBadgeGuests">50</span>
       </button>
-      <button class="tab-btn" onclick="switchTab('tab-rsvp')">
-        <span>💌 Confirmaciones Online</span>
-        <span class="tab-badge" id="tabBadgeRSVP">0</span>
-      </button>
       <button class="tab-btn" onclick="switchTab('tab-individual')">
         <span>📤 Envío Individual</span>
       </button>
@@ -806,8 +802,15 @@
             <input type="text" class="search-input" id="adminSearchInput" placeholder="Buscar por nombre del invitado o celular..." oninput="renderGuests()">
           </div>
           <button class="btn-export" onclick="exportGuestsToCSV()">
-            📥 Exportar Lista a Excel (CSV)
+            📥 Exportar Lista (CSV)
           </button>
+          <button class="btn-export" onclick="exportBackupJSON()" title="Descargar copia de seguridad en JSON">
+            💾 Guardar Respaldo
+          </button>
+          <button class="btn-export" onclick="document.getElementById('importBackupInput').click()" title="Restaurar copia de seguridad">
+            📂 Cargar Respaldo
+          </button>
+          <input type="file" id="importBackupInput" accept=".json" style="display: none;" onchange="importBackupJSON(event)">
         </div>
 
         <div class="filter-pills-row">
@@ -827,81 +830,6 @@
 
       <div class="guests-grid" id="adminGuestsGrid">
         <!-- Renderizado dinámicamente con JS -->
-      </div>
-    </section>
-
-    <!-- PESTAÑA 2: CONFIRMACIONES ONLINE RECIBIDAS (RSVP EN TIEMPO REAL) -->
-    <section id="tab-rsvp" class="tab-content" style="display: none;">
-      <div class="rsvp-online-panel">
-        <div class="rsvp-online-header">
-          <div>
-            <h2 class="rsvp-online-title">Confirmaciones Recibidas desde la Tarjeta</h2>
-            <p style="font-size: 0.8rem; color: var(--color-text-muted);">
-              Aquí aparecen las personas que han confirmado asistencia a través de su tarjeta digital o directamente con los novios.
-            </p>
-          </div>
-          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button class="rsvp-sync-btn" onclick="fetchCloudConfirmations()">
-              🔄 Sincronizar en Vivo
-            </button>
-            <button class="btn-export" onclick="restoreYesterdayConfirmations()" style="background: #2e7d32; color: #fff; font-weight: 700;" title="Dejar únicamente los 3 confirmados 100% verificados (Katalina, Luis y Sandra, Raul y Sandra)">
-              🧹 Dejar Solo Confirmados Reales (3)
-            </button>
-            <button class="btn-export" onclick="toggleManualRSVPPanel()" style="background: var(--color-gold-deep); color: #fff;">
-              ➕ Registrar Confirmación
-            </button>
-            <button class="btn-export" onclick="exportRSVPToCSV()">
-              📥 Descargar Reporte (CSV)
-            </button>
-            <button class="btn-export" onclick="exportBackupJSON()" title="Descargar copia de seguridad completa">
-              💾 Guardar Respaldo
-            </button>
-            <button class="btn-export" onclick="document.getElementById('importBackupInput').click()" title="Restaurar copia en este celular o computador">
-              📂 Cargar Respaldo
-            </button>
-            <input type="file" id="importBackupInput" accept=".json" style="display: none;" onchange="importBackupJSON(event)">
-          </div>
-        </div>
-
-        <!-- Panel Desplegable para Registrar Confirmación Manual / WhatsApp -->
-        <div id="manualRSVPPanel" style="display: none; background: #faf9f5; border: 1.5px dashed var(--color-gold-primary); border-radius: 12px; padding: 18px 20px; margin-bottom: 22px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-            <h3 style="font-family: var(--font-serif); font-size: 1.25rem; color: var(--color-olive-dark);">
-              ➕ Registrar Confirmación de Invitado
-            </h3>
-            <span style="font-size: 0.72rem; color: var(--color-gold-deep); font-weight: 600;">Suma de inmediato a los números oficiales</span>
-          </div>
-          <p style="font-size: 0.78rem; color: var(--color-text-muted); margin-bottom: 14px;">
-            Si alguien confirmó por WhatsApp directamente a los novios o telefónicamente, regístralo aquí para que quede contabilizado de forma permanente:
-          </p>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px;">
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label">Invitado de la Lista:</label>
-              <select id="manualSelectGuest" class="form-input">
-                <!-- Llenado con GUESTS -->
-              </select>
-            </div>
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label">Respuesta de Asistencia:</label>
-              <select id="manualAttendance" class="form-input">
-                <option value="si">✅ Asistirá con alegría</option>
-                <option value="no">❌ No podrá asistir</option>
-              </select>
-            </div>
-            <div class="form-group" style="margin: 0;">
-              <label class="form-label">Mensaje o Nota (Opcional):</label>
-              <input type="text" id="manualMessage" class="form-input" placeholder="Ej: Confirmó por WhatsApp con alegría">
-            </div>
-          </div>
-          <div style="display: flex; gap: 10px; justify-content: flex-end;">
-            <button type="button" class="btn-action btn-copy" onclick="toggleManualRSVPPanel()">Cancelar</button>
-            <button type="button" class="btn-submit" style="width: auto; padding: 9px 24px;" onclick="saveManualRSVP()">💾 Guardar y Sincronizar</button>
-          </div>
-        </div>
-
-        <div id="rsvpConfirmationsContainer" class="rsvp-confirmations-list">
-          <!-- Renderizado dinámicamente con JS -->
-        </div>
       </div>
     </section>
 
@@ -1110,23 +1038,13 @@
             </div>
           </div>
 
-          <button type="submit" class="btn-submit" style="margin-top: 14px;">💾 Guardar Cambios</button>
-        </form>
-      </div>
-    </section>
-
-  </main>
-
-  <div class="toast" id="adminToast">¡Enlace copiado!</div>
-
-  <script type="module">
+          <button type="submit" class="btn-submit" style="margin-top: 14px;">💾 Guardar Cambi  <script type="module">
     import { GUESTS } from './data/guests.js';
 
     let currentPassFilter = 'all';
     let currentStatusFilter = 'all';
     let guestStatuses = {};
     let sentStatuses = {};
-    let cloudConfirmations = [];
     let currentIndivGuestId = null;
 
     // Conexión Supabase
@@ -1148,7 +1066,7 @@
         guestStatuses[g.id] = g.status || 'pending';
       });
 
-      // 2. Fusionar con cualquier cambio guardado en el navegador
+      // 2. Fusionar con cualquier cambio guardado en el navegador (caché local)
       try {
         const saved = localStorage.getItem('wedding_guest_rsvp_statuses');
         if (saved) {
@@ -1166,41 +1084,31 @@
     async function syncWithSupabase() {
       if (!supabase) return;
       try {
-        const { data, error } = await supabase.from('wedding_guests').select('*');
+        const { data, error } = await supabase
+          .from('wedding_guests')
+          .select('id, status, sent');
         if (!error && data && data.length > 0) {
           data.forEach(row => {
             if (row.id && row.status) {
               guestStatuses[row.id] = row.status;
             }
+            if (row.id && row.sent !== undefined && row.sent !== null) {
+              sentStatuses[row.id] = !!row.sent;
+            }
           });
+          try {
+            localStorage.setItem('wedding_guest_rsvp_statuses', JSON.stringify(guestStatuses));
+            localStorage.setItem('wedding_sent_status', JSON.stringify(sentStatuses));
+          } catch(e) {}
           updateKPICounters();
           renderGuests();
+          if (document.getElementById('tab-individual').style.display !== 'none') {
+            renderIndivTable();
+          }
         }
       } catch (err) {
-        // Silencioso si la tabla no existe aún
+        console.warn('Sync Supabase:', err);
       }
-    }
-
-    async function saveStatusesToSupabase() {
-      if (!supabase) return;
-      try {
-        const updates = Object.keys(guestStatuses).map(id => ({
-          id: parseInt(id, 10),
-          status: guestStatuses[id],
-          updated_at: new Date().toISOString()
-        }));
-        await supabase.from('wedding_guests').upsert(updates);
-      } catch (err) {}
-    }
-
-    function saveGuestStatuses() {
-      try {
-        localStorage.setItem('wedding_guest_rsvp_statuses', JSON.stringify(guestStatuses));
-      } catch (e) {
-        console.error(e);
-      }
-      updateKPICounters();
-      saveStatusesToSupabase();
     }
 
     // Cargar historial de tarjetas enviadas
@@ -1232,9 +1140,7 @@
       const content = document.getElementById(tabId);
       if (content) content.style.display = 'block';
 
-      if (tabId === 'tab-rsvp') {
-        fetchCloudConfirmations();
-      } else if (tabId === 'tab-individual') {
+      if (tabId === 'tab-individual') {
         renderIndivTable();
       }
     };
@@ -1253,11 +1159,41 @@
       renderGuests();
     };
 
-    window.setGuestStatus = function(guestId, status) {
+    // Actualizar estado del invitado y guardar directamente en Supabase y localmente
+    window.setGuestStatus = async function(guestId, status) {
       guestStatuses[guestId] = status;
-      saveGuestStatuses();
+      try {
+        localStorage.setItem('wedding_guest_rsvp_statuses', JSON.stringify(guestStatuses));
+      } catch (e) {
+        console.error(e);
+      }
+      updateKPICounters();
       renderGuests();
-      showAdminToast(`Estado de invitado actualizado`);
+
+      const stName = status === 'confirmed' ? '✅ Asiste' : status === 'declined' ? '❌ No Asiste' : '⏳ Pendiente';
+      showAdminToast(`Guardando: ${stName}...`);
+
+      if (supabase) {
+        try {
+          const { error } = await supabase
+            .from('wedding_guests')
+            .update({ 
+              status: status, 
+              updated_at: new Date().toISOString() 
+            })
+            .eq('id', guestId);
+
+          if (error) {
+            console.error('Error actualizando estado en Supabase:', error);
+            showAdminToast(`⚠️ Guardado local (Error en BD: ${error.message})`);
+          } else {
+            showAdminToast(`✓ ${stName} guardado en la Base de Datos`);
+          }
+        } catch (e) {
+          console.error('Error al conectar con Supabase:', e);
+          showAdminToast(`✓ ${stName} guardado localmente`);
+        }
+      }
     };
 
     // Actualizar contadores y tarjetas de resumen
@@ -1398,228 +1334,11 @@
     };
 
     // =========================================================================
-    // CONFIRMACIONES ONLINE (RSVP EN TIEMPO REAL DESDE NTFY.SH + LOCAL PERSISTENTE)
-    // =========================================================================
-    window.fetchCloudConfirmations = async function() {
-      const container = document.getElementById('rsvpConfirmationsContainer');
-      const badge = document.getElementById('tabBadgeRSVP');
-      if (container) {
-        container.innerHTML = `<div style="text-align: center; padding: 20px; color: var(--color-text-muted);">Sincronizando confirmaciones en línea...</div>`;
-      }
-
-      let localList = [];
-      try {
-        localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
-      } catch (e) { localList = []; }
-
-      // 1. Consultar base de datos Supabase
-      let supabaseList = [];
-      if (supabase) {
-        try {
-          const { data, error } = await supabase.from('wedding_rsvps').select('*').order('created_at', { ascending: false });
-          if (!error && data && data.length > 0) {
-            supabaseList = data.map(d => ({
-              id: d.id,
-              name: d.name,
-              attendance: d.attendance,
-              statusText: d.status_text,
-              message: d.message,
-              date: d.created_at
-            }));
-          }
-        } catch(err) {
-          console.warn('Supabase fetch rsvps warning:', err);
-        }
-      }
-
-      // 2. Combinar con localStorage
-      const combined = [...supabaseList];
-      localList.forEach(l => {
-        const exists = combined.some(x => x.name && l.name && x.name.toLowerCase().trim() === l.name.toLowerCase().trim());
-        if (!exists) combined.push(l);
-      });
-
-      try {
-        localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(combined));
-      } catch (e) {}
-
-      // Auto-sincronizar estados en la lista oficial
-      combined.forEach(c => {
-        const isYes = c.attendance === 'si';
-        const matched = GUESTS.find(g => 
-          (g.name && c.name && g.name.toLowerCase().trim() === c.name.toLowerCase().trim()) ||
-          (g.name && c.name && g.name.toLowerCase().includes(c.name.toLowerCase())) ||
-          (c.name && g.name && c.name.toLowerCase().includes(g.name.toLowerCase()))
-        );
-        if (matched && (!guestStatuses[matched.id] || guestStatuses[matched.id] === 'pending')) {
-          guestStatuses[matched.id] = isYes ? 'confirmed' : 'declined';
-        }
-      });
-      saveGuestStatuses();
-
-      cloudConfirmations = combined;
-      renderConfirmationsList();
-      if (badge) badge.textContent = cloudConfirmations.length;
-    };
-
-    function renderConfirmationsList() {
-      const container = document.getElementById('rsvpConfirmationsContainer');
-      if (!container) return;
-
-      container.innerHTML = '';
-
-      if (cloudConfirmations.length === 0) {
-        container.innerHTML = `
-          <div style="text-align: center; padding: 40px; color: var(--color-text-muted); background: #fafbfa; border-radius: 10px; border: 1px dashed #dce2d7;">
-            <p style="font-size: 1.1rem; margin-bottom: 6px;">Aún no hay confirmaciones registradas en línea.</p>
-            <p style="font-size: 0.8rem;">Cuando un invitado confirme en su tarjeta o registres su confirmación manualmente con el botón de arriba, aparecerá aquí inmediatamente.</p>
-          </div>
-        `;
-        return;
-      }
-
-      cloudConfirmations.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'rsvp-item-card';
-
-        const isYes = item.attendance === 'si';
-        const formattedDate = item.date ? new Date(item.date).toLocaleString('es-CO', { dateStyle: 'medium', timeStyle: 'short' }) : 'Reciente';
-
-        // Buscar coincidencia en la lista oficial
-        const matchedGuest = GUESTS.find(g => 
-          (g.name && item.name && g.name.toLowerCase().trim() === item.name.toLowerCase().trim()) ||
-          (g.name && item.name && g.name.toLowerCase().includes(item.name.toLowerCase())) ||
-          (item.name && g.name && item.name.toLowerCase().includes(g.name.toLowerCase()))
-        );
-
-        div.innerHTML = `
-          <div class="rsvp-item-left">
-            <div class="rsvp-item-name">${item.name}</div>
-            <div class="rsvp-item-date">📅 Recibido: ${formattedDate}</div>
-            ${item.message ? `<div class="rsvp-item-msg">💬 "${item.message}"</div>` : ''}
-          </div>
-
-          <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-            <span class="rsvp-status-badge ${isYes ? 'badge-yes' : 'badge-no'}">
-              ${isYes ? '✅ Asistirá con alegría' : '❌ No podrá asistir'}
-            </span>
-
-            ${matchedGuest ? `
-              <button class="btn-action btn-preview" style="padding: 6px 12px; font-size: 0.72rem;" onclick="markGuestFromRSVP(${matchedGuest.id}, '${isYes ? 'confirmed' : 'declined'}')">
-                ✓ Sincronizar en Lista (${matchedGuest.name})
-              </button>
-            ` : ''}
-
-            <button class="btn-action" style="padding: 6px 10px; font-size: 0.72rem; background: #fff0f0; color: #c62828; border: 1px solid #ffcdd2;" onclick="deleteRSVPItem(${index})" title="Eliminar registro">
-              🗑️
-            </button>
-          </div>
-        `;
-
-        container.appendChild(div);
-      });
-    }
-
-    window.markGuestFromRSVP = function(guestId, status) {
-      guestStatuses[guestId] = status;
-      saveGuestStatuses();
-      renderGuests();
-      showAdminToast('✓ Invitado sincronizado en la lista oficial');
-    };
-
-    window.toggleManualRSVPPanel = function() {
-      const panel = document.getElementById('manualRSVPPanel');
-      if (panel) {
-        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-      }
-    };
-
-    function initManualRSVPSelect() {
-      const select = document.getElementById('manualSelectGuest');
-      if (!select) return;
-      select.innerHTML = '';
-      GUESTS.forEach(g => {
-        const opt = document.createElement('option');
-        opt.value = g.id;
-        opt.textContent = `${g.name} (${g.passes} ${g.passes === 1 ? 'pase' : 'pases'})`;
-        select.appendChild(opt);
-      });
-    }
-
-    window.saveManualRSVP = function() {
-      const select = document.getElementById('manualSelectGuest');
-      const attSelect = document.getElementById('manualAttendance');
-      const msgInput = document.getElementById('manualMessage');
-
-      const guestId = parseInt(select.value, 10);
-      const guest = GUESTS.find(g => g.id === guestId);
-      if (!guest) return;
-
-      const attendance = attSelect.value;
-      const isYes = attendance === 'si';
-      const statusText = isYes ? '¡Sí, asistiré con mucha alegría!' : 'Lamentablemente no podré asistir';
-      const message = (msgInput.value || '').trim();
-
-      const newRecord = {
-        name: guest.name,
-        attendance: attendance,
-        statusText: statusText,
-        message: message,
-        date: new Date().toISOString()
-      };
-
-      // Guardar en la lista permanente
-      let list = [];
-      try {
-        list = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
-      } catch (e) { list = []; }
-
-      list.push(newRecord);
-      localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(list));
-
-      // Actualizar estado del invitado
-      guestStatuses[guest.id] = isYes ? 'confirmed' : 'declined';
-      saveGuestStatuses();
-
-      // Recargar confirmaciones
-      cloudConfirmations = list.slice().reverse();
-      renderConfirmationsList();
-      const badge = document.getElementById('tabBadgeRSVP');
-      if (badge) badge.textContent = cloudConfirmations.length;
-
-      // Limpiar y ocultar panel
-      msgInput.value = '';
-      document.getElementById('manualRSVPPanel').style.display = 'none';
-      showAdminToast(`✓ Confirmación de ${guest.name} guardada exitosamente`);
-      renderGuests();
-    };
-
-    window.deleteRSVPItem = function(index) {
-      if (!confirm('¿Deseas eliminar este registro de confirmación?')) return;
-      let list = [];
-      try {
-        list = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
-      } catch (e) { list = []; }
-
-      const actualIndex = list.length - 1 - index;
-      if (actualIndex >= 0 && actualIndex < list.length) {
-        list.splice(actualIndex, 1);
-        localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(list));
-        cloudConfirmations = list.slice().reverse();
-        renderConfirmationsList();
-        const badge = document.getElementById('tabBadgeRSVP');
-        if (badge) badge.textContent = cloudConfirmations.length;
-        showAdminToast('Registro eliminado');
-      }
-    };
-
-    // =========================================================================
     // RESPALDO Y RESTAURACIÓN JSON (ENTRE DISPOSITIVOS)
     // =========================================================================
     window.exportBackupJSON = function() {
       const backupData = {
         wedding_guest_rsvp_statuses: guestStatuses,
-        wedding_rsvp_confirmations: JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]'),
         wedding_sent_status: sentStatuses,
         exportedAt: new Date().toISOString()
       };
@@ -1640,81 +1359,35 @@
       if (!file) return;
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const data = JSON.parse(e.target.result);
           if (data.wedding_guest_rsvp_statuses) {
             guestStatuses = { ...guestStatuses, ...data.wedding_guest_rsvp_statuses };
-            saveGuestStatuses();
+            try {
+              localStorage.setItem('wedding_guest_rsvp_statuses', JSON.stringify(guestStatuses));
+            } catch(err) {}
+            // Sincronizar masivamente a Supabase si está disponible
+            if (supabase) {
+              for (const [id, st] of Object.entries(guestStatuses)) {
+                await supabase.from('wedding_guests').update({ status: st, updated_at: new Date().toISOString() }).eq('id', parseInt(id, 10));
+              }
+            }
           }
           if (data.wedding_sent_status) {
             sentStatuses = { ...sentStatuses, ...data.wedding_sent_status };
             saveSentStatuses();
           }
-          if (data.wedding_rsvp_confirmations) {
-            let localList = JSON.parse(localStorage.getItem('wedding_rsvp_confirmations') || '[]');
-            const combined = [...localList];
-            data.wedding_rsvp_confirmations.forEach(c => {
-              const exists = combined.some(x => x.name === c.name && x.date === c.date);
-              if (!exists) combined.push(c);
-            });
-            localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(combined));
-            cloudConfirmations = combined.slice().reverse();
-            renderConfirmationsList();
-            const badge = document.getElementById('tabBadgeRSVP');
-            if (badge) badge.textContent = cloudConfirmations.length;
-          }
+          updateKPICounters();
           renderGuests();
           renderIndivTable();
-          showAdminToast('📂 ¡Respaldo restaurado correctamente!');
+          showAdminToast('📂 ¡Respaldo restaurado y guardado en la BD!');
         } catch (err) {
           alert('Error al leer el archivo de respaldo: ' + err.message);
         }
       };
       reader.readAsText(file);
       event.target.value = '';
-    };
-
-    window.restoreYesterdayConfirmations = function() {
-      guestStatuses = {
-        4: 'confirmed',
-        16: 'confirmed',
-        30: 'confirmed'
-      };
-
-      const verifiedList = [
-        {
-          name: "Raul y Sandra",
-          attendance: "si",
-          statusText: "¡Sí, asistiré con mucha alegría!",
-          message: "Confirmado por WhatsApp",
-          date: "2026-10-07T19:45:00.000Z"
-        },
-        {
-          name: "Katalina",
-          attendance: "si",
-          statusText: "¡Sí, asistiré con mucha alegría!",
-          message: "",
-          date: "2026-10-08T06:50:00.000Z"
-        },
-        {
-          name: "Luis y Sandra",
-          attendance: "si",
-          statusText: "¡Sí, asistiré con mucha alegría!",
-          message: "Que el señor siga bendiciendo esta unión de tantos años y ahora mucho más por qué eran bajo su bendición los queremos mucho y damos gracias por tenernos presentes para este día tan especial",
-          date: "2026-10-08T06:53:00.000Z"
-        }
-      ];
-
-      saveGuestStatuses();
-      localStorage.setItem('wedding_rsvp_confirmations', JSON.stringify(verifiedList));
-      cloudConfirmations = verifiedList.slice().reverse();
-      renderConfirmationsList();
-      const badge = document.getElementById('tabBadgeRSVP');
-      if (badge) badge.textContent = cloudConfirmations.length;
-      renderGuests();
-      renderIndivTable();
-      showAdminToast(`✓ Lista limpia: 3 confirmados reales activos`);
     };
 
     // =========================================================================
@@ -1781,11 +1454,7 @@
 
       const msg = `¡Hola *${name}*!\n\n` +
         `Estamos muy emocionados de compartir este día tan especial contigo. Queremos asegurarnos de que tu lugar esté reservado ${passesText}, así que nos encantaría saber si podrías acompañarnos.\n\n` +
-        `¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial.\n\n` +
-        `Puedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n` +
-        `${cardLink}\n\n` +
-        `Con todo nuestro cariño,\n` +
-        `— *Fernando & Luisa Fernanda*`;
+        `¿Podrías confirmar tu asistencia antes del 13 de Octubre? Tu presencia hará que este día sea aún más especial.\n\nPuedes conocer todos los detalles de la boda y confirmar aquí en tu tarjeta interactiva:\n${cardLink}\n\nCon todo nuestro cariño,\n— *Fernando & Luisa Fernanda*`;
 
       document.getElementById('indivMessagePreview').value = msg;
 
@@ -1838,6 +1507,9 @@
       updateIndivSentButton();
       renderIndivTable();
       initIndividualSender(); // refrescar etiquetas en dropdown
+      if (supabase) {
+        supabase.from('wedding_guests').update({ sent: !!sentStatuses[currentIndivGuestId], updated_at: new Date().toISOString() }).eq('id', currentIndivGuestId).catch(console.warn);
+      }
       showAdminToast(sentStatuses[currentIndivGuestId] ? '✓ Marcado como entregado' : 'Marcado como pendiente');
     };
 
@@ -1900,6 +1572,9 @@
       renderIndivTable();
       if (currentIndivGuestId === guestId) updateIndivSentButton();
       initIndividualSender();
+      if (supabase) {
+        supabase.from('wedding_guests').update({ sent: !!sentStatuses[guestId], updated_at: new Date().toISOString() }).eq('id', guestId).catch(console.warn);
+      }
       showAdminToast('Estado de envío actualizado');
     };
 
@@ -1925,24 +1600,8 @@
         csv += `"${g.id}","${g.name.replace(/"/g, '""')}","${g.passes}","${g.phone || ''}","${stText}","${sentText}","${link}"\n`;
       });
 
-      downloadCSV(csv, 'lista_invitados_boda_edgar_y_luisa.csv');
+      downloadCSV(csv, 'lista_invitados_boda_fernando_y_luisa.csv');
       showAdminToast('📥 Descargando lista de invitados en CSV');
-    };
-
-    window.exportRSVPToCSV = function() {
-      if (cloudConfirmations.length === 0) {
-        alert('No hay confirmaciones para exportar todavía.');
-        return;
-      }
-
-      let csv = 'Nombre,Respuesta,Fecha y Hora,Mensaje\n';
-      cloudConfirmations.forEach(c => {
-        const resp = c.attendance === 'si' ? 'Asiste' : 'No asiste';
-        csv += `"${(c.name || '').replace(/"/g, '""')}","${resp}","${c.date || ''}","${(c.message || '').replace(/"/g, '""')}"\n`;
-      });
-
-      downloadCSV(csv, 'confirmaciones_rsvp_boda.csv');
-      showAdminToast('📥 Descargando confirmaciones en CSV');
     };
 
     function downloadCSV(csvContent, filename) {
@@ -2054,8 +1713,6 @@
     updateKPICounters();
     renderGuests();
     initIndividualSender();
-    initManualRSVPSelect();
-    fetchCloudConfirmations();
   </script>
 </body>
 </html>
