@@ -102,6 +102,9 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
+// Cache en memoria para reintentos de cifrado de WhatsApp (evita 'Esperando mensaje')
+const messageCache = new Map();
+
 // Iniciar conexión con Baileys
 async function initBaileys() {
   addLog('Iniciando cliente de WhatsApp Baileys...');
@@ -123,12 +126,24 @@ async function initBaileys() {
     syncFullHistory: false,
     markOnlineOnConnect: false,
     generateHighQualityLinkPreview: false,
+    getMessage: async (key) => {
+      const cached = messageCache.get(key.id);
+      return cached ? cached.message : undefined;
+    },
     logger: pino({ level: 'silent' }),
   });
 
   BotState.sock = sock;
 
   sock.ev.on('creds.update', saveCreds);
+
+  sock.ev.on('messages.upsert', async ({ messages }) => {
+    for (const m of messages) {
+      if (m.key && m.key.id) {
+        messageCache.set(m.key.id, m);
+      }
+    }
+  });
 
   sock.ev.on('connection.update', async (update) => {
     const { connection, lastDisconnect, qr } = update;
@@ -216,16 +231,22 @@ async function sendMessageToJid(jid, guest, text) {
     const thumbPath = path.join(__dirname, '../assets/tarjeta_invitacion_thumb.jpg');
     const thumbBuffer = fs.existsSync(thumbPath) ? fs.readFileSync(thumbPath) : undefined;
 
-    await BotState.sock.sendMessage(jid, { 
+    const sent = await BotState.sock.sendMessage(jid, { 
       document: pdfBuffer, 
       mimetype: 'application/pdf',
       fileName: cleanFileName,
       jpegThumbnail: thumbBuffer,
       caption: text 
     });
+    if (sent?.key?.id) {
+      messageCache.set(sent.key.id, sent);
+    }
   } else {
     // Si no está disponible el PDF, enviar texto
-    await BotState.sock.sendMessage(jid, { text });
+    const sent = await BotState.sock.sendMessage(jid, { text });
+    if (sent?.key?.id) {
+      messageCache.set(sent.key.id, sent);
+    }
   }
 }
 
@@ -388,7 +409,7 @@ const server = http.createServer(async (req, res) => {
           slug = matched?.slug || slugify(guestName);
         }
 
-        const msg = buildMessage(guestName, passes);
+        const msg = (data.customMessage && data.customMessage.trim().length > 0) ? data.customMessage.trim() : buildMessage(guestName, passes);
         const testGuest = { name: guestName, passes: passes, slug: slug };
 
         addLog(`🧪 Enviando prueba en PDF a ${guestName} (+${jid.replace('@s.whatsapp.net', '')}) [PDF: Invitacion_Boda_${slug}.pdf]...`);
@@ -468,7 +489,9 @@ const server = http.createServer(async (req, res) => {
         let slug = data.slug || guestObj.slug || slugify(guestName);
 
         const guestToSend = { name: guestName, passes: passes, slug: slug };
-        const message = buildMessage(guestName, passes);
+        const message = (data.customMessage && data.customMessage.trim().length > 0) 
+          ? data.customMessage.trim() 
+          : buildMessage(guestName, passes);
 
         addLog(`📤 [Envío Individual] Enviando PDF oficial a ${guestName} (+${jid.replace('@s.whatsapp.net', '')})...`);
         await sendMessageToJid(jid, guestToSend, message);
@@ -774,6 +797,16 @@ function renderHtml() {
         </div>
       </div>
 
+      <div class="form-group" style="margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label style="margin-bottom: 0;">3. Mensaje que acompaña al PDF (Opcional - Si se deja en blanco usará el saludo estándar):</label>
+          <button type="button" class="btn" style="background: #f1f5f9; border: 1px solid #cbd5e1; font-size: 0.72rem; padding: 3px 8px; cursor: pointer;" onclick="loadApologyTemplate()">
+            ✨ Cargar plantilla de disculpa / corrección
+          </button>
+        </div>
+        <textarea id="botIndivMessage" rows="5" style="width: 100%; border: 1px solid var(--border); border-radius: 8px; padding: 10px; font-family: inherit; font-size: 0.8rem; line-height: 1.4; resize: vertical;" placeholder="Escribe un mensaje personalizado o deja vacío para usar el saludo estándar..."></textarea>
+      </div>
+
       <div style="display: flex; gap: 12px; margin-bottom: 16px;">
         <button class="btn btn-primary" id="btnSendIndivBot" onclick="sendIndividualFromBot()" style="font-size: 0.9rem;">
           📄 Enviar Invitación Oficial en PDF a este Invitado
@@ -861,6 +894,9 @@ function renderHtml() {
 
         if (data.logs && data.logs.length > 0) {
           document.getElementById('terminalLogs').innerHTML = data.logs.join('<br>');
+        }
+        if (botGuestsList.length === 0) {
+          loadBotGuests();
         }
       } catch (err) {
         console.warn('Error fetching status:', err);
@@ -996,11 +1032,37 @@ function renderHtml() {
       }
     }
 
+    function getApologyText(guestName) {
+      var name = guestName || 'Familia';
+      return [
+        '¡Hola *' + name + '*! ✨',
+        'Ofrecemos disculpas, ya que durante el proceso de elaboración y registro de las invitaciones se presentó un error en la cantidad de invitados asignada a su familia.',
+        'Nos permitimos enviarles la invitación corregida, en la cual se confirma que el cupo correspondiente es para *cinco (5) personas*.',
+        'Lamentamos los inconvenientes que esta situación haya podido ocasionar y agradecemos su comprensión. Para nosotros es muy importante contar con su compañía y bendición en este día tan especial; ¡los esperamos con mucho cariño para celebrar juntos!',
+        'Al abrir el documento PDF adjunto podrán conocer todos los detalles y pulsar directamente en el botón para abrir su tarjeta interactiva y confirmar la asistencia de los 5 integrantes.',
+        'Con todo nuestro afecto,\\n— *Fernando & Luisa Fernanda*'
+      ].join('\\n\\n');
+    }
+
+    function loadApologyTemplate() {
+      const select = document.getElementById('botIndivGuestSelect');
+      const guestId = parseInt(select.value, 10);
+      const guest = botGuestsList.find(g => g.id === guestId);
+      document.getElementById('botIndivMessage').value = getApologyText(guest?.name || 'Familia Guzmán Moreno');
+    }
+
     function onBotSelectIndivGuest(guestId) {
       const guest = botGuestsList.find(g => g.id === parseInt(guestId, 10));
       if (!guest) return;
       document.getElementById('botIndivPhone').value = guest.phone || '';
       document.getElementById('botPhoneCheckStatus').textContent = '';
+      
+      const msgArea = document.getElementById('botIndivMessage');
+      if (guest.id === 26 || (guest.name && guest.name.toLowerCase().includes('guzman'))) {
+        msgArea.value = getApologyText(guest.name);
+      } else {
+        msgArea.value = '';
+      }
     }
 
     async function verifyWhatsAppNumber() {
@@ -1032,6 +1094,7 @@ function renderHtml() {
     async function sendIndividualFromBot() {
       const select = document.getElementById('botIndivGuestSelect');
       const phoneInput = document.getElementById('botIndivPhone');
+      const customMsgInput = document.getElementById('botIndivMessage');
       const btn = document.getElementById('btnSendIndivBot');
 
       const guestId = parseInt(select.value, 10);
@@ -1058,7 +1121,8 @@ function renderHtml() {
             name: guest.name,
             phone: targetPhone,
             passes: guest.passes,
-            slug: guest.slug
+            slug: guest.slug,
+            customMessage: customMsgInput ? customMsgInput.value.trim() : ''
           })
         });
         const data = await res.json();

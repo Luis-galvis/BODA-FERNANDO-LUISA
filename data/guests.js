@@ -1,5 +1,5 @@
 // Lista oficial de invitados para la boda
-// Total: 50 invitaciones | Confirmados: 27 (49 pases) | Pendientes: 23 (39 pases)
+// Total: 51 invitaciones | Confirmados: 27 (49 pases) | Pendientes: 24 (40 pases)
 export const GUESTS = [
   {
     "id": 1,
@@ -449,6 +449,15 @@ export const GUESTS = [
     "passes": 2,
     "reservaText": "Esta invitación está reservada para 2 personas",
     "phone": "3125304333",
+    "status": "pending"
+  },
+  {
+    "id": 51,
+    "slug": "jessica",
+    "name": "Jessica",
+    "passes": 1,
+    "reservaText": "Esta invitación está reservada para 1 persona",
+    "phone": "3209406411",
     "status": "pending"
   }
 ];
